@@ -1,6 +1,39 @@
+import { useCurrentAccount } from "@iota/dapp-kit";
 import { Copy, Edit, Pen } from "lucide-react";
+import { trimAddress } from "../utils/helper";
+import toast from "react-hot-toast";
+import Jazzicon from "react-jazzicon";
+import { useOutletContext } from "react-router-dom";
 
 const Profile = () => {
+  const currentAccount = useCurrentAccount();
+  const RegisteredUserData = useOutletContext();
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(currentAccount?.address);
+    toast("Copied");
+  };
+
+  const user = RegisteredUserData[0];
+
+  if (RegisteredUserData.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-primary-bg text-primary-text">
+        <p className="text-lg">No profile data found. Please register first.</p>
+      </div>
+    );
+  }
+
+  if (!currentAccount) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-primary-bg text-primary-text">
+        <p className="text-lg">
+          Please connect your wallet to view your profile.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-primary-bg font-display text-primary-text">
       <div className="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
@@ -20,7 +53,7 @@ const Profile = () => {
                         <div className="flex items-center gap-2">
                           <span className="w-3 h-3 rounded-full bg-green-500"></span>
                           <p className="text-primary-text text-lg font-bold leading-tight">
-                            Connected
+                            Verified
                           </p>
                         </div>
                         <p className="text-secondary-text text-sm font-normal leading-normal">
@@ -34,10 +67,13 @@ const Profile = () => {
                       </p>
                       <div className="flex items-center gap-2">
                         <p className="text-primary-text text-sm font-mono truncate">
-                          iota1qrc...z9q5
+                          {trimAddress(currentAccount?.address)}
                         </p>
-                        <button className="flex items-center justify-center rounded-md h-7 px-2 bg-secondary-bg text-secondary-text text-xs font-medium hover:bg-gray-200">
-                          <Copy className="ext-base mr-1" size={10} />
+                        <button
+                          onClick={handleCopy}
+                          className="flex items-center justify-center rounded-md h-7 px-2 bg-secondary-bg text-secondary-text text-xs font-medium cursor-pointer hover:bg-gray-200"
+                        >
+                          <Copy className="ext-base mr-1 " size={10} />
                         </button>
                       </div>
                     </div>
@@ -51,38 +87,31 @@ const Profile = () => {
                     <div className="flex flex-col sm:flex-row w-full gap-6 @[520px]:justify-between @[520px]:items-center">
                       <div className="flex items-center gap-6">
                         <div className="relative">
-                          <div
-                            className="bg-center bg-no-repeat aspect-square bg-cover rounded-full min-h-32 w-32"
-                            data-alt="User profile picture"
-                            style={{
-                              backgroundImage:
-                                'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAFvV77Qw5xI5BjJ_pUobHD449Fe_LvOoTzywPdhWiFq-7jNzAnz8Gcst1v644ocp_PcXGkCXbY3AZblrqlF4GzCG67SV9wOc9i5KEeR-pYaD79ovCt5Y4sqGz7G2T4wObHCN-CGMzr6F5VwazRFGhOTGDFMROKCf3dNzofgrou-SbUjJaKVVFSBFh1Y3X5xqhHY2HMENfvV93Hw9cWfzZalXM2WBHhblIDRHqNa6GVNiI5Zu5TubAjbTdXGxcb39PoRmrqr7u-Aw")',
-                            }}
-                          ></div>
-                          <button className="absolute bottom-0 right-0 flex items-center justify-center w-8 h-8 rounded-full bg-primary-color text-white hover:bg-blue-700">
-                            <Pen size={15} />
-                          </button>
+                          <Jazzicon
+                            diameter={100}
+                            seed={currentAccount?.address}
+                          />
                         </div>
                         <div className="flex flex-col justify-center gap-1">
                           <p className="text-primary-text text-[22px] font-bold leading-tight tracking-[-0.015em]">
-                            SatoshiN
+                            {user.full_name}
                           </p>
                           <p className="text-secondary-text text-base font-normal leading-normal">
-                            satoshi.n@email.com
+                            {user.email}
                           </p>
                           <p className="text-secondary-text text-base font-normal leading-normal mt-1">
                             Web3 enthusiast and real estate investor.
                           </p>
                         </div>
                       </div>
-                      <div className="flex w-full sm:w-auto gap-3">
+                      {/* <div className="flex w-full sm:w-auto gap-3">
                         <button className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-secondary-bg text-primary-text text-sm font-bold leading-normal tracking-[0.015em] flex-1 hover:bg-gray-200">
                           <span className="truncate">Edit</span>
                         </button>
                         <button className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary-color text-white text-sm font-bold leading-normal tracking-[0.015em] flex-1 hover:bg-blue-700">
                           <span className="truncate">Save Changes</span>
                         </button>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 </div>

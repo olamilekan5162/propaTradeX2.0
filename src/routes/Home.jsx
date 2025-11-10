@@ -1,6 +1,11 @@
+import { useEffect } from "react";
 import Hero from "../components/Hero";
+import PropertyCard from "../components/PropertyCard";
+import { useFetchProperty } from "../hooks/useFetchProperty";
 
 const Home = () => {
+  const { propertyDetails, isPending } = useFetchProperty();
+
   return (
     <div className="bg-primary-bg font-display text-primary-text">
       <div className="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
@@ -41,74 +46,15 @@ const Home = () => {
                     Featured Properties{" "}
                   </h2>
                   <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6 p-4">
-                    <div className="flex flex-col gap-3 pb-3 rounded-lg bg-secondary-bg overflow-hidden group">
-                      <div
-                        className="w-full bg-center bg-no-repeat aspect-video bg-cover transition-transform duration-300 group-hover:scale-105"
-                        data-alt="A modern villa with a swimming pool"
-                        style={{
-                          backgroundImage:
-                            'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBPx36n8MBcQx4xgAwer8Uiq33oJPcgBc_1u9xYtVEEUb-3g1FIaE6FSd4mAlpdwZi8L7HzIWenDirVQdzah1lkRLvObUmu3gIulN7N2Ueeltq9jDSHgkC_rNsCKYK0gug_nSZXEX2BZRzIJwAl0ES0gEqZHeJmLoeiqeD-5uCv1_q5tG9SpOfhI5pTzKRNQGNyYknP37SyWBB2JKBIIXxSSBonRqaNz7RDxf8CJdK2kVmlHkQXOhvs4_XpdMb7AGLIXlhUJYGc6A")',
-                        }}
-                      ></div>
-                      <div className="px-4">
-                        <p className="text-primary-text text-base font-medium leading-normal">
-                          {" "}
-                          Modern Villa in Miami{" "}
-                        </p>
-                        <p className="text-secondary-color text-sm font-bold leading-normal">
-                          {" "}
-                          1,500,000 IOTA{" "}
-                        </p>
-                        <p className="text-secondary-text text-sm font-normal leading-normal">
-                          {" "}
-                          3 beds, 2 baths, 2,500 sqft{" "}
-                        </p>
-                      </div>
-                      <div className="flex gap-2 px-4 pb-2 mt-2">
-                        <button className="flex-1 text-center py-2 rounded-md bg-primary-color text-white text-sm font-bold hover:bg-opacity-80">
-                          {" "}
-                          Buy{" "}
-                        </button>
-                        <button className="flex-1 text-center py-2 rounded-md bg-gray-300 text-primary-text text-sm font-bold hover:bg-gray-400">
-                          {" "}
-                          View Details{" "}
-                        </button>
-                      </div>
-                    </div>
-                    <div className="flex flex-col gap-3 pb-3 rounded-lg bg-secondary-bg overflow-hidden group">
-                      <div
-                        className="w-full bg-center bg-no-repeat aspect-video bg-cover transition-transform duration-300 group-hover:scale-105"
-                        data-alt="Luxury condo with a view of the ocean"
-                        style={{
-                          backgroundImage:
-                            'url("https://lh3.googleusercontent.com/aida-public/AB6AXuC8b7D7SZBlY2qNhjPeggpWU03E1e0r07zMsuZmh2JUDe1NyICybxmJ6qhsF55KviXM0Tbr-pfb5j2gBtmYfS6bnhPzGx6AxJAJkQ3Jt0hB_ZcbCetqco5-0nX-uJuegwH5L1PyDFh0b092U70LEmI1M8acy3C3qSTQRy1Fq3vwDw5Wgffl5AZmq8swQHYWj8arPfEiPPDTicaIBkSAezsLdQIuvgRhjvJuID3bm7JTVnKcALC7ne7bj_1uXbTioO4m03yhbNLI4w")',
-                        }}
-                      ></div>
-                      <div className="px-4">
-                        <p className="text-primary-text text-base font-medium leading-normal">
-                          {" "}
-                          Luxury Condo with Ocean View{" "}
-                        </p>
-                        <p className="text-secondary-color text-sm font-bold leading-normal">
-                          {" "}
-                          3,200,000 IOTA{" "}
-                        </p>
-                        <p className="text-secondary-text text-sm font-normal leading-normal">
-                          {" "}
-                          2 beds, 2 baths, 1,800 sqft{" "}
-                        </p>
-                      </div>
-                      <div className="flex gap-2 px-4 pb-2 mt-2">
-                        <button className="flex-1 text-center py-2 rounded-md bg-primary-color text-white text-sm font-bold hover:bg-opacity-80">
-                          {" "}
-                          Buy{" "}
-                        </button>
-                        <button className="flex-1 text-center py-2 rounded-md bg-gray-300 text-primary-text text-sm font-bold hover:bg-gray-400">
-                          {" "}
-                          View Details{" "}
-                        </button>
-                      </div>
-                    </div>
+                    {isPending && propertyDetails.length === 0
+                      ? "loading..."
+                      : propertyDetails.map((property) => (
+                          <PropertyCard
+                            key={property?.id?.id}
+                            property={property}
+                          />
+                        ))}
+
                     <div className="flex flex-col gap-3 pb-3 rounded-lg bg-secondary-bg overflow-hidden group">
                       <div
                         className="w-full bg-center bg-no-repeat aspect-video bg-cover transition-transform duration-300 group-hover:scale-105"
@@ -149,40 +95,14 @@ const Home = () => {
                     Recent Listings{" "}
                   </h2>
                   <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6 p-4">
-                    <div className="flex flex-col gap-3 pb-3 rounded-lg bg-secondary-bg overflow-hidden group">
-                      <div
-                        className="w-full bg-center bg-no-repeat aspect-video bg-cover transition-transform duration-300 group-hover:scale-105"
-                        data-alt="Downtown Loft Apartment"
-                        style={{
-                          backgroundImage:
-                            'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAhQCcQR-wCEyJSghuJZsQWEFXzD5xerLksUN73H66GigIhHSKWrnOgFNLOieHQlae3jTJpkqx5HhYvc4pNINWeZWmntBhBUT6lMLMGE3tIndoXucozHQc15yFF8K4HVyCJyBCGDUUE3GuMqa2TzryZ4C68Vh32WixlrEJEltWFqjyevh64l9ku2xHUYWO9m68MRV5bRxk8dmsdLE2_Ghgy_dPobfvAMVGWB_grPlOV2Bl9FcZRsYAzjpiwroKNoAUNcFytDRGePA")',
-                        }}
-                      ></div>
-                      <div className="px-4">
-                        <p className="text-primary-text text-base font-medium leading-normal">
-                          {" "}
-                          Downtown Loft Apartment{" "}
-                        </p>
-                        <p className="text-secondary-color text-sm font-bold leading-normal">
-                          {" "}
-                          1,100,000 IOTA{" "}
-                        </p>
-                        <p className="text-secondary-text text-sm font-normal leading-normal">
-                          {" "}
-                          1 bed, 1 bath, 1,200 sqft{" "}
-                        </p>
-                      </div>
-                      <div className="flex gap-2 px-4 pb-2 mt-2">
-                        <button className="flex-1 text-center py-2 rounded-md bg-primary-color text-white text-sm font-bold hover:bg-opacity-80">
-                          {" "}
-                          Buy{" "}
-                        </button>
-                        <button className="flex-1 text-center py-2 rounded-md bg-gray-300 text-primary-text text-sm font-bold hover:bg-gray-400">
-                          {" "}
-                          View Details{" "}
-                        </button>
-                      </div>
-                    </div>
+                    {isPending && propertyDetails.length === 0
+                      ? "loading..."
+                      : propertyDetails.map((property) => (
+                          <PropertyCard
+                            key={property?.id?.id}
+                            property={property}
+                          />
+                        ))}
                     <div className="flex flex-col gap-3 pb-3 rounded-lg bg-secondary-bg overflow-hidden group">
                       <div
                         className="w-full bg-center bg-no-repeat aspect-video bg-cover transition-transform duration-300 group-hover:scale-105"

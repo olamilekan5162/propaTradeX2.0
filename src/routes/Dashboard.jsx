@@ -1,7 +1,91 @@
 import { ChevronLeft, ChevronRight, Search } from "lucide-react";
-import React from "react";
+import { useState, useMemo } from "react";
+import { useNetworkVariables } from "../config/networkConfig";
+import { useCurrentAccount, useIotaClientQuery } from "@iota/dapp-kit";
+import EscrowCard from "../components/EscrowCard";
 
 const Dashboard = () => {
+  const [activeTab, setActiveTab] = useState("owned");
+  const currentAccount = useCurrentAccount();
+  const { propatradexPackageId } = useNetworkVariables("propatradexPackageId");
+
+  //  Query EscrowCreated events involving current user
+  const { data: escrowData, isPending: isEscrowPending } = useIotaClientQuery(
+    "queryEvents",
+    {
+      query: {
+        MoveEventType: `${propatradexPackageId}::propatradex::EscrowCreated`,
+      },
+    },
+    {
+      select: (data) =>
+        data.data
+          .flatMap((x) => x.parsedJson)
+          .filter(
+            (y) =>
+              y.seller_landlord === currentAccount.address ||
+              y.buyer_renter === currentAccount.address
+          ),
+    }
+  );
+
+  //  Query PropertyReceipt objects owned by current user
+  const { data: receipts, isPending: isReceiptPending } = useIotaClientQuery(
+    "getOwnedObjects",
+    {
+      owner: currentAccount?.address || "",
+      filter: {
+        StructType: `${propatradexPackageId}::propatradex::PropertyReceipt`,
+      },
+      options: {
+        showContent: true,
+      },
+    },
+    {
+      enabled: !!currentAccount?.address,
+      select: (data) => data?.data?.map((x) => x?.data?.content?.fields) ?? [],
+    }
+  );
+
+  // Combine escrow data with receipt objects
+  const enrichedEscrows = useMemo(() => {
+    if (!escrowData || !receipts) return [];
+
+    return escrowData.map((escrow) => {
+      const myReceipt = receipts.find(
+        (receipt) =>
+          receipt.property_id === escrow.property_id ||
+          receipt.timestamp === escrow.timestamp
+      );
+
+      const {
+        property_id,
+        listing_type,
+        seller_landlord_address,
+        buyer_renter_address,
+        ...receiptRest
+      } = myReceipt || {};
+
+      console.log("Enriched Escrow:", {
+        ...escrow,
+        ...receiptRest,
+        myReceiptId: myReceipt?.id?.id || null,
+        isBuyer: currentAccount?.address === escrow.buyer_renter,
+        isSeller: currentAccount?.address === escrow.seller_landlord,
+      });
+
+      return {
+        ...escrow,
+        ...receiptRest,
+        myReceiptId: myReceipt?.id?.id || null,
+        isBuyer: currentAccount?.address === escrow.buyer_renter,
+        isSeller: currentAccount?.address === escrow.seller_landlord,
+      };
+    });
+  }, [escrowData, receipts, currentAccount?.address]);
+
+  const isPending = isEscrowPending || isReceiptPending;
+
   return (
     <div className="bg-primary-bg font-display text-primary-text">
       <div className="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
@@ -177,36 +261,24 @@ const Dashboard = () => {
                     </div>
                   </div>
                 </div>
-                <div className="pb-3 bg-primary-bg rounded-t-lg">
-                  <div className="flex border-b border-border-color px-4 gap-8">
-                    <a
-                      className="flex flex-col items-center justify-center border-b-[3px] border-b-primary-color text-primary-color pb-[13px] pt-4"
-                      href="#"
+                {/* Tabs */}
+                <div className="flex border-b border-border-color gap-8 mb-6">
+                  {["owned", "listed", "escrow"].map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setActiveTab(tab)}
+                      className={`pb-3 pt-4 text-sm font-bold transition-colors ${
+                        activeTab === tab
+                          ? "text-primary-color border-b-[3px] border-b-primary-color"
+                          : "text-secondary-text border-b-[3px] border-b-transparent hover:text-primary-color hover:border-b-primary-color/50"
+                      }`}
                     >
-                      <p className="text-sm font-bold leading-normal tracking-[0.015em]">
-                        Owned
-                      </p>
-                    </a>
-                    <a
-                      className="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-secondary-text pb-[13px] pt-4 hover:border-b-primary-color/50 hover:text-primary-color transition-colors"
-                      href="#"
-                    >
-                      <p className="text-sm font-bold leading-normal tracking-[0.015em]">
-                        Listed
-                      </p>
-                    </a>
-                    <a
-                      className="flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-secondary-text pb-[13px] pt-4 hover:border-b-primary-color/50 hover:text-primary-color transition-colors"
-                      href="#"
-                    >
-                      <p className="text-sm font-bold leading-normal tracking-[0.015em]">
-                        Rented
-                      </p>
-                    </a>
-                  </div>
+                      {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                    </button>
+                  ))}
                 </div>
                 <div className="px-4 py-3 bg-primary-bg ">
-                  <label className="flex flex-col min-w-40 h-12 w-full">
+                  <label className="flex flex-col min-w-40 h-12 w-full mb-6">
                     <div className="flex w-full flex-1 items-stretch rounded-lg h-full border border-border-color">
                       <div className="text-secondary-text flex border border-r-0 border-border-color bg-secondary-bg items-center justify-center pl-4 rounded-l-lg">
                         <Search />
@@ -218,8 +290,42 @@ const Dashboard = () => {
                       />
                     </div>
                   </label>
+
+                  {/* Tab Content */}
+                  {activeTab === "owned" && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {/* ✅ Existing Owned Property Cards here */}
+                      <p className="text-secondary-text">
+                        Owned properties go here...
+                      </p>
+                    </div>
+                  )}
+
+                  {activeTab === "listed" && (
+                    <div className="text-secondary-text">
+                      You have not listed any property yet.
+                    </div>
+                  )}
+
+                  {activeTab === "escrow" && (
+                    <div className="flex flex-col gap-4">
+                      {isPending ? (
+                        <p className="text-secondary-text">
+                          Loading escrow data...
+                        </p>
+                      ) : enrichedEscrows.length === 0 ? (
+                        <p className="text-secondary-text">
+                          No escrow transactions found.
+                        </p>
+                      ) : (
+                        enrichedEscrows.map((escrow, i) => (
+                          <EscrowCard key={i} escrow={escrow} />
+                        ))
+                      )}
+                    </div>
+                  )}
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4 bg-primary-bg rounded-b-lg">
+                {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4 bg-primary-bg rounded-b-lg">
                   <div className="rounded-lg bg-primary-bg border border-border-color overflow-hidden flex flex-col  hover:border-primary-color transition-all duration-300 shadow-sm">
                     <div
                       className="h-48 bg-cover bg-center"
@@ -278,24 +384,7 @@ const Dashboard = () => {
                       </button>
                     </div>
                   </div>
-                </div>
-                <div className="flex justify-center items-center gap-2 pt-6">
-                  <button className="size-8 rounded-lg bg-primary-bg border border-border-color text-secondary-text hover:bg-secondary-bg hover:text-primary-text transition-colors flex items-center justify-center">
-                    <ChevronLeft className="text-base" />
-                  </button>
-                  <button className="size-8 rounded-lg bg-primary-color text-primary-bg font-bold text-sm">
-                    1
-                  </button>
-                  <button className="size-8 rounded-lg bg-primary-bg text-secondary-text font-bold text-sm hover:bg-secondary-bg hover:text-primary-text transition-colors">
-                    2
-                  </button>
-                  <button className="size-8 rounded-lg bg-primary-bg text-secondary-text font-bold text-sm hover:bg-secondary-bg hover:text-primary-text transition-colors">
-                    3
-                  </button>
-                  <button className="size-8 rounded-lg bg-primary-bg border border-border-color text-secondary-text hover:bg-secondary-bg hover:text-primary-text transition-colors flex items-center justify-center">
-                    <ChevronRight className="text-base" />
-                  </button>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>

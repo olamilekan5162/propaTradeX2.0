@@ -1,3 +1,4 @@
+import { ConnectButton } from "@iota/dapp-kit";
 import React from "react";
 import { NavLink } from "react-router-dom";
 
@@ -34,15 +35,15 @@ const Navbar = () => {
         <div className="hidden md:flex flex-1 justify-center gap-8">
           <NavLink
             className="text-secondary-text text-sm font-medium leading-normal hover:text-primary "
-            to="home"
+            to="/"
           >
             Home
           </NavLink>
           <NavLink
             className="text-primary text-sm font-medium leading-normal"
-            to="listing"
+            to="kyc"
           >
-            Listings
+            Kyc
           </NavLink>
           <NavLink
             className="text-secondary-text text-sm font-medium leading-normal hover:text-primary "
@@ -64,9 +65,8 @@ const Navbar = () => {
           </NavLink>
         </div>
         <div className="flex items-center gap-4">
-          <button className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary-color text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors">
-            Connect Wallet
-          </button>
+          <ConnectButton className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary-color text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors" />
+
           <NavLink
             to={"profile"}
             className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"

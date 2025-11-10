@@ -1,3 +1,4 @@
+import { useIotaClientQuery } from "@iota/dapp-kit";
 import {
   Bath,
   BedDouble,
@@ -6,9 +7,43 @@ import {
   Play,
   Ruler,
   TowerControl,
+  CalendarDays,
 } from "lucide-react";
 
+import { useParams } from "react-router-dom";
+import { usePropertyhook } from "../hooks/usePropertyHook";
+
 const Listing = () => {
+  const { id } = useParams();
+  const { buyOrRentProperty } = usePropertyhook();
+
+  const {
+    data: property,
+    isPending,
+    isError,
+  } = useIotaClientQuery(
+    "getObject",
+    { id, options: { showContent: true, showOwner: true } },
+    { select: (data) => data.data?.content?.fields }
+  );
+
+  const handleBuyorRent = async (property) => {
+    console.log("buying or renting");
+
+    await buyOrRentProperty(property);
+    console.log("bought or rented");
+  };
+
+  if (isPending) {
+    return (
+      <div className="flex items-center justify-center h-screen text-primary-text">
+        Loading property details...
+      </div>
+    );
+  }
+
+  const isForSale = property?.listing_type === 1;
+
   return (
     <div className="bg-primary-bg  text-primary-text ">
       <div className="relative flex h-full min-h-screen w-full flex-col  overflow-x-hidden">
@@ -18,18 +53,17 @@ const Listing = () => {
               <div
                 className="w-full bg-center bg-no-repeat bg-cover flex flex-col justify-end overflow-hidden rounded-xl min-h-[400px] mb-8"
                 style={{
-                  backgroundImage:
-                    'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBL6xySfp5TEEL0pE3LQtQpq1Jd1dLISKpAXWNVotFxCG1YPN0xti_4_OqmH7eQZglN9dgArWOIkWL6jB9tO8EUFpEMcBkq5YGThY5o4FM27i1Z_p2xETLuvxAV1DwiOukW0ujQj8ukO7l1ahXOPwh-lAxy7dYf72kgroFANBiy_5STRG6xcQXjb9drV3oN7r-EZIku-h4CP3Q2yVZYgQ4Qw4NnA5kwfWMXUdLrGExQi1yRues1x8ocknTs95ubftCe0EatxVIz3A")',
+                  backgroundImage: `url("${property?.images_cids[0]}")`,
                 }}
               ></div>
               <div className="flex flex-col lg:flex-row gap-8">
                 <div className="lg:w-2/3">
                   <div className="mb-6">
                     <h1 className="text-primary-text text-4xl font-black leading-tight tracking-[-0.033em]">
-                      Modern Downtown Loft with Skyline Views
+                      {property?.property_type}
                     </h1>
                     <p className="text-secondary-text font-normal leading-normal mt-2">
-                      123 Main Street, Metropolis
+                      {property?.property_address}
                     </p>
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8 border-y border-gray-200 py-6">
@@ -66,109 +100,104 @@ const Listing = () => {
                       Property Description
                     </h3>
                     <p className="text-secondary-textleading-relaxed">
-                      Discover the pinnacle of urban living in this exquisite
-                      downtown loft. Boasting breathtaking skyline views from
-                      floor-to-ceiling windows, this modern residence is
-                      designed for comfort and style. The open-concept living
-                      space is perfect for entertaining, featuring high-end
-                      finishes, hardwood floors, and a gourmet kitchen with
-                      state-of-the-art appliances. Retreat to the spacious
-                      master suite with its spa-like ensuite bathroom. Located
-                      in the heart of Metropolis, you are just steps away from
-                      the finest dining, shopping, and cultural attractions.
+                      {property?.description}
                     </p>
                   </div>
+                  {/* Conditional Rent Info */}
+                  {!isForSale && (
+                    <div className="mb-8 space-y-3">
+                      <h3 className="text-2xl font-bold mb-2">
+                        Rental Information
+                      </h3>
+                      <p>
+                        <strong>Monthly Rent:</strong>{" "}
+                        {property?.monthly_rent || "N/A"} IOTA
+                      </p>
+                      <p>
+                        <strong>Rental Period:</strong>{" "}
+                        {property?.rental_period_months} months
+                      </p>
+                    </div>
+                  )}
                   <div>
                     <h3 className="text-2xl font-bold text-primary-text mb-4">
                       Inspection Video
                     </h3>
-                    <div className=" w-full sm:w-64 h-64 aspect-w-16 aspect-h-9 rounded-lg overflow-hidden bg-black relative">
-                      <div
-                        className="absolute inset-0 bg-center bg-cover"
-                        style={{
-                          backgroundImage:
-                            'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBL6xySfp5TEEL0pE3LQtQpq1Jd1dLISKpAXWNVotFxCG1YPN0xti_4_OqmH7eQZglN9dgArWOIkWL6jB9tO8EUFpEMcBkq5YGThY5o4FM27i1Z_p2xETLuvxAV1DwiOukW0ujQj8ukO7l1ahXOPwh-lAxy7dYf72kgroFANBiy_5STRG6xcQXjb9drV3oN7r-EZIku-h4CP3Q2yVZYgQ4Qw4NnA5kwfWMXUdLrGExQi1yRues1x8ocknTs95ubftCe0EatxVIz3A")',
-                          filter: "blur(4px) brightness(0.7)",
-                        }}
-                      ></div>
-
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <button className="w-20 h-20 bg-white/30 rounded-full flex items-center justify-center backdrop-blur-sm transition-transform hover:scale-110">
-                          <Play className="text-white text-6xl" />
-                        </button>
-                      </div>
+                    <div>
+                      <video
+                        controls
+                        className="rounded-lg w-full h-[350px] object-cover shadow-md"
+                      >
+                        <source src={property?.video_cid} type="video/mp4" />
+                        Your browser does not support the video tag.
+                      </video>
                     </div>
                   </div>
                 </div>
                 <div className="lg:w-1/3">
                   <div className="sticky top-8 bg-primary-bg p-6 rounded-xl shadow-lg border border-gray-200">
                     <h3 className="text-2xl font-bold text-primary-text ">
-                      Actions
+                      Action
                     </h3>
-                    <div className="mb-6">
-                      <p className="text-sm font-medium text-secondary-text  mb-2">
-                        Transaction Status
-                      </p>
-                      <div className="flex items-center gap-3 bg-green-100 text-green-600 p-3 rounded-lg">
-                        <CheckCircle className="material-symbols-outlined" />
 
-                        <p className="font-bold">Confirmed</p>
+                    <div className="space-y-4 mb-6 mt-2">
+                      {isForSale ? (
+                        <button
+                          onClick={() => handleBuyorRent(property)}
+                          className="w-full h-12 bg-primary-color text-white font-semibold rounded-lg hover:opacity-90 transition"
+                        >
+                          Buy Property
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleBuyorRent(property)}
+                          className="w-full h-12 bg-secondary-color text-white font-semibold rounded-lg hover:opacity-90 transition"
+                        >
+                          Rent Property
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Web3 Info */}
+                    <div className="border-t border-gray-200 pt-4 space-y-3 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-secondary-text">
+                          Property ID:
+                        </span>
+                        <span className="truncate max-w-[160px] font-medium">
+                          {property?.id?.id?.slice(0, 10)}...
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-secondary-text">Owner:</span>
+                        <span className="truncate max-w-[160px] font-medium">
+                          {property?.owner?.slice(0, 10)}...
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-secondary-text">Price:</span>
+                        <span className="font-medium">
+                          {property.price} IOTA
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-secondary-text">Explorer:</span>
+                        <a
+                          href="#"
+                          className="text-primary-color flex items-center gap-1 hover:underline"
+                        >
+                          View on Tangle <ExternalLink size={14} />
+                        </a>
                       </div>
                     </div>
-                    <div className="flex flex-col gap-4 mb-6">
-                      <button className="w-full flex items-center justify-center h-12 px-6 bg-primary-color text-white text-base font-bold rounded-lg hover:bg-primary/90 transition-colors">
-                        Buy Now
-                      </button>
-                      <button className="w-full flex items-center justify-center h-12 px-6 bg-secondary-color text-white text-base font-bold rounded-lg hover:bg-secondary/90 transition-colors">
-                        Rent Now
-                      </button>
-                    </div>
-                    <div className="border-t border-gray-200 pt-6">
-                      <h4 className="text-lg font-bold text-primary-text mb-4">
-                        Receipt
-                      </h4>
-                      <div className="space-y-3 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-secondary-text ">
-                            Transaction ID:
-                          </span>
-                          <a
-                            className="text-primary-color hover:underline font-medium truncate ml-2"
-                            href="#"
-                            title="0x123...abc"
-                          >
-                            0x123...abc
-                          </a>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-secondary-text ">Date:</span>
-                          <span className="font-medium text-primary-text ">
-                            2023-10-27
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-secondary-text ">Time:</span>
-                          <span className="font-medium text-primary-text ">
-                            14:30 UTC
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-secondary-text ">Price:</span>
-                          <span className="font-medium text-primary-text">
-                            1,500,000 IOTA
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-secondary-text">Explorer:</span>
-                          <a
-                            className="text-primary-color hover:underline font-medium flex items-center gap-1"
-                            href="#"
-                          >
-                            <span>View on Tangle</span>
-                            <ExternalLink size={15} />
-                          </a>
-                        </div>
-                      </div>
+
+                    {/* Created Date */}
+                    <div className="border-t border-gray-200 pt-4 mt-4 text-sm flex items-center gap-2 text-secondary-text">
+                      <CalendarDays size={15} />
+                      Listed on:{" "}
+                      {new Date(
+                        Number(property?.created_at)
+                      ).toLocaleDateString()}
                     </div>
                   </div>
                 </div>
@@ -182,3 +211,212 @@ const Listing = () => {
 };
 
 export default Listing;
+
+// import {
+//   BedDouble,
+//   Bath,
+//   Ruler,
+//   PlayCircle,
+//   Wallet,
+//   CheckCircle,
+//   ExternalLink,
+//   Home,
+//   CalendarDays,
+// } from "lucide-react";
+// import { useEffect, useState } from "react";
+// import { useParams } from "react-router-dom";
+
+// const Listing = () => {
+//   const { id } = useParams();
+//   const [property, setProperty] = useState(null);
+
+//   // Simulated backend fetch
+//   useEffect(() => {
+//     const fetchedProperty = {
+//       created_at: "1762636061255",
+//       deposit_required: "0",
+//       description: "A fully furnished duplex with modern amenities.",
+//       documents_cid:
+//         "https://black-far-coyote-812.mypinata.cloud/ipfs/bafkreihtayeplpfcltyaavzwaa4ob7depyrpgmrrlu7xuswgyaibsaiwpi",
+//       id: {
+//         id: "0x7ce71945552d5a6eeb5aea04428a73d9a6d5bb456e8e7f16352094a472ce4fc7",
+//       },
+//       images_cids: [
+//         "https://black-far-coyote-812.mypinata.cloud/ipfs/bafybeiflsfqksh6mmzzhnjum6or5pxefmxabmqfrd7yqekzjqkckksmfju",
+//       ],
+//       listing_type: 1,
+//       owner:
+//         "0x9376d085279477aa00ff03ba7674f87329c58cf0efe698a4b0af11dee143b14f",
+//       price: "10",
+//       property_address: "123 Main Street",
+//       property_type: "Duplex",
+//       rental_end_date: null,
+//       rental_period_months: "0",
+//       rental_start_date: null,
+//       status: 1,
+//       video_cid:
+//         "https://black-far-coyote-812.mypinata.cloud/ipfs/bafkreibw4abhxkbx4475fgzel3etgakmhzyylf47woe5ddbobpzl32vgmi",
+//     };
+//     setTimeout(() => setProperty(fetchedProperty), 500);
+//   }, [id]);
+
+//   if (!property) {
+//     return (
+//       <div className="flex items-center justify-center h-screen text-primary-text">
+//         Loading property details...
+//       </div>
+//     );
+//   }
+
+//   const isForSale = property.listing_type === 1;
+
+//   return (
+//     <div className="bg-primary-bg text-primary-text min-h-screen">
+//       <div className="max-w-7xl mx-auto px-4 md:px-10 lg:px-20 py-10">
+//         {/* Gallery */}
+//         <div className="flex flex-col lg:flex-row gap-10">
+//           <div className="lg:w-2/3">
+//             <div className="rounded-xl overflow-hidden shadow-md mb-6">
+//               <img
+//                 src={property.images_cids[0]}
+//                 alt="Property"
+//                 className="w-full object-cover h-[400px]"
+//               />
+//             </div>
+
+//             {/* Title + Address */}
+//             <div className="mb-6">
+//               <h1 className="text-4xl font-bold leading-tight">
+//                 {property.property_type}
+//               </h1>
+//               <p className="text-secondary-text mt-2">
+//                 {property.property_address}
+//               </p>
+//             </div>
+
+//             {/* Property Info */}
+//             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8 border-y border-gray-200 py-6">
+//               <div className="flex items-center gap-2">
+//                 <BedDouble className="text-primary-color" />
+//                 <p>3 Bedrooms</p>
+//               </div>
+//               <div className="flex items-center gap-2">
+//                 <Bath className="text-primary-color" />
+//                 <p>2 Bathrooms</p>
+//               </div>
+//               <div className="flex items-center gap-2">
+//                 <Ruler className="text-primary-color" />
+//                 <p>1200 sqft</p>
+//               </div>
+//               <div className="flex items-center gap-2">
+//                 <Home className="text-primary-color" />
+//                 <p>{isForSale ? "For Sale" : "For Rent"}</p>
+//               </div>
+//             </div>
+
+//             {/* Description */}
+//             <div className="mb-8">
+//               <h3 className="text-2xl font-bold mb-4">Property Description</h3>
+//               <p className="text-secondary-text leading-relaxed">
+//                 {property.description}
+//               </p>
+//             </div>
+
+//             {/* Conditional Rent Info */}
+//             {!isForSale && (
+//               <div className="mb-8 space-y-3">
+//                 <h3 className="text-2xl font-bold mb-2">Rental Information</h3>
+//                 <p>
+//                   <strong>Monthly Rent:</strong>{" "}
+//                   {property.monthly_rent || "N/A"} IOTA
+//                 </p>
+//                 <p>
+//                   <strong>Rental Period:</strong>{" "}
+//                   {property.rental_period_months} months
+//                 </p>
+//               </div>
+//             )}
+
+//             {/* Video */}
+//             <div>
+//               <h3 className="text-2xl font-bold mb-4">Inspection Video</h3>
+//               <video
+//                 controls
+//                 className="rounded-lg w-full h-[350px] object-cover shadow-md"
+//               >
+//                 <source src={property.video_cid} type="video/mp4" />
+//                 Your browser does not support the video tag.
+//               </video>
+//             </div>
+//           </div>
+
+//           {/* Right side - Actions */}
+//           <div className="lg:w-1/3">
+//             <div className="sticky top-8 bg-secondary-bg p-6 rounded-xl shadow-md border border-gray-200">
+//               <h3 className="text-xl font-bold mb-4">Actions</h3>
+
+//               <div className="space-y-4 mb-6">
+//                 {isForSale ? (
+//                   <button className="w-full h-12 bg-primary-color text-white font-semibold rounded-lg hover:opacity-90 transition">
+//                     Buy Property
+//                   </button>
+//                 ) : (
+//                   <button className="w-full h-12 bg-secondary-color text-white font-semibold rounded-lg hover:opacity-90 transition">
+//                     Rent Property
+//                   </button>
+//                 )}
+//               </div>
+
+//               {/* Status */}
+//               <div className="mb-6">
+//                 <p className="text-sm mb-2 font-medium">Transaction Status</p>
+//                 <div className="flex items-center gap-2 bg-green-100 text-green-700 px-3 py-2 rounded-md">
+//                   <CheckCircle size={16} />
+//                   <span>Confirmed</span>
+//                 </div>
+//               </div>
+
+//               {/* Web3 Info */}
+//               <div className="border-t border-gray-200 pt-4 space-y-3 text-sm">
+//                 <div className="flex justify-between">
+//                   <span className="text-secondary-text">Property ID:</span>
+//                   <span className="truncate max-w-[160px] font-medium">
+//                     {property.id.id.slice(0, 10)}...
+//                   </span>
+//                 </div>
+//                 <div className="flex justify-between">
+//                   <span className="text-secondary-text">Owner:</span>
+//                   <span className="truncate max-w-[160px] font-medium">
+//                     {property.owner.slice(0, 10)}...
+//                   </span>
+//                 </div>
+//                 <div className="flex justify-between">
+//                   <span className="text-secondary-text">Price:</span>
+//                   <span className="font-medium">{property.price} IOTA</span>
+//                 </div>
+//                 <div className="flex justify-between items-center">
+//                   <span className="text-secondary-text">Explorer:</span>
+//                   <a
+//                     href="#"
+//                     className="text-primary-color flex items-center gap-1 hover:underline"
+//                   >
+//                     View on Tangle <ExternalLink size={14} />
+//                   </a>
+//                 </div>
+//               </div>
+
+//               {/* Created Date */}
+//               <div className="border-t border-gray-200 pt-4 mt-4 text-sm flex items-center gap-2 text-secondary-text">
+//                 <CalendarDays size={15} />
+//                 Listed on:{" "}
+//                 {new Date(Number(property.created_at)).toLocaleDateString()}
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Listing;

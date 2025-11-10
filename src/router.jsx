@@ -4,8 +4,9 @@ import Home from "./routes/Home";
 import Dashboard from "./routes/Dashboard";
 import Listing from "./routes/Listing";
 import Profile from "./routes/Profile";
-import Upload from "./routes/Upload";
 import Chat from "./routes/Chat";
+import KycPage from "./routes/KycPage";
+import UploadPage from "./routes/UploadPage";
 
 export const router = createBrowserRouter([
   {
@@ -14,9 +15,10 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Home /> },
       { path: "dashboard", element: <Dashboard /> },
-      { path: "listing", element: <Listing /> },
+      { path: "kyc", element: <KycPage /> },
+      { path: "listing/:id", element: <Listing /> },
       { path: "profile", element: <Profile /> },
-      { path: "upload", element: <Upload /> },
+      { path: "upload", element: <UploadPage /> },
       { path: "chats", element: <Chat /> },
     ],
   },
