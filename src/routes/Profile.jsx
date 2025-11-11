@@ -1,9 +1,9 @@
 import { useCurrentAccount } from "@iota/dapp-kit";
-import { Copy, Edit, Pen } from "lucide-react";
+import { Copy, ArrowRight, LogOut } from "lucide-react";
 import { trimAddress } from "../utils/helper";
 import toast from "react-hot-toast";
 import Jazzicon from "react-jazzicon";
-import { useOutletContext } from "react-router-dom";
+import { Link, useOutletContext } from "react-router-dom";
 import UnconnectedState from "../components/States/UnconnectedState";
 import NotRegisteredState from "../components/States/NotRegisteredState";
 
@@ -12,249 +12,134 @@ const Profile = () => {
   const registeredUserData = useOutletContext();
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(currentAccount?.address);
-    toast("Copied");
+    if (currentAccount?.address) {
+      navigator.clipboard.writeText(currentAccount.address);
+      toast.success("Copied to clipboard!");
+    }
   };
 
-  const user = registeredUserData[0];
-  console.log(registeredUserData)
-  if (registeredUserData.length === 0) {
-    return (
-      <NotRegisteredState/>
-    );
-  }
+  const handleDisconnect = () => {
+    // Add your disconnect logic here
+    toast.success("Wallet disconnected");
+  };
 
   if (!currentAccount) {
-    return (
-     <UnconnectedState />
-    );
+    return <UnconnectedState />;
   }
 
+  if (!registeredUserData || registeredUserData.length === 0) {
+    return <NotRegisteredState />;
+  }
+
+  const user = registeredUserData[0];
+
   return (
-    <div className="bg-primary-bg font-display text-primary-text">
-      <div className="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
-        <div className="layout-container flex h-full grow flex-col">
-          <main className="flex-1 px-4 sm:px-6 lg:px-8 py-8 bg-secondary-bg ">
-            <div className="max-w-7xl mx-auto">
-              <div className="mb-8">
-                <p className="text-primary-text text-4xl font-black leading-tight tracking-[-0.033em]">
-                  Wallet &amp; Profile
-                </p>
-              </div>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-1 flex flex-col gap-8">
-                  <div className="p-6 rounded-xl bg-primary-bg  shadow-md">
-                    <div className="flex items-center justify-between gap-4">
-                      <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-2">
-                          <span className="w-3 h-3 rounded-full bg-green-500"></span>
-                          <p className="text-primary-text text-lg font-bold leading-tight">
-                            Verified
-                          </p>
-                        </div>
-                        <p className="text-secondary-text text-sm font-normal leading-normal">
-                          Iota User
-                        </p>
-                      </div>
-                    </div>
-                    <div className="mt-4 flex flex-col gap-2">
-                      <p className="text-secondary-text text-xs font-medium">
-                        Wallet Address
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <p className="text-primary-text text-sm font-mono truncate">
-                          {trimAddress(currentAccount?.address)}
-                        </p>
-                        <button
-                          onClick={handleCopy}
-                          className="flex items-center justify-center rounded-md h-7 px-2 bg-secondary-bg text-secondary-text text-xs font-medium cursor-pointer hover:bg-gray-200"
-                        >
-                          <Copy className="ext-base mr-1 " size={10} />
-                        </button>
-                      </div>
-                    </div>
-                    <button className="mt-6 w-full flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-secondary-color text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-orange-700">
-                      <span className="truncate">Disconnect</span>
-                    </button>
-                  </div>
-                </div>
-                <div className="lg:col-span-2 flex flex-col gap-8">
-                  <div className="bg-primary-bg p-6 rounded-xl shadow-md">
-                    <div className="flex flex-col sm:flex-row w-full gap-6 @[520px]:justify-between @[520px]:items-center">
-                      <div className="flex items-center gap-6">
-                        <div className="relative">
-                          <Jazzicon
-                            diameter={100}
-                            seed={currentAccount?.address}
-                          />
-                        </div>
-                        <div className="flex flex-col justify-center gap-1">
-                          <p className="text-primary-text text-[22px] font-bold leading-tight tracking-[-0.015em]">
-                            {user.full_name}
-                          </p>
-                          <p className="text-secondary-text text-base font-normal leading-normal">
-                            {user.email}
-                          </p>
-                          <p className="text-secondary-text text-base font-normal leading-normal mt-1">
-                            Web3 enthusiast and real estate investor.
-                          </p>
-                        </div>
-                      </div>
-                      {/* <div className="flex w-full sm:w-auto gap-3">
-                        <button className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-secondary-bg text-primary-text text-sm font-bold leading-normal tracking-[0.015em] flex-1 hover:bg-gray-200">
-                          <span className="truncate">Edit</span>
-                        </button>
-                        <button className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary-color text-white text-sm font-bold leading-normal tracking-[0.015em] flex-1 hover:bg-blue-700">
-                          <span className="truncate">Save Changes</span>
-                        </button>
-                      </div> */}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-12">
-                <h2 className="text-primary-text text-2xl font-bold leading-tight tracking-[-0.015em] mb-4">
-                  Transaction History
-                </h2>
-                <div className="bg-primary-bg rounded-xl shadow-md overflow-hidden">
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left text-secondary-text ">
-                      <thead className="text-xs text-secondary-text uppercase bg-secondary-bg">
-                        <tr>
-                          <th className="px-6 py-3" scope="col">
-                            Date
-                          </th>
-                          <th className="px-6 py-3" scope="col">
-                            Transaction Type
-                          </th>
-                          <th className="px-6 py-3" scope="col">
-                            Property
-                          </th>
-                          <th className="px-6 py-3" scope="col">
-                            Amount (IOTA)
-                          </th>
-                          <th className="px-6 py-3" scope="col">
-                            Status
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr className="bg-primary-bg  border-b border-gray-200 hover:bg-secondary-bg ">
-                          <td className="px-6 py-4">2023-10-26</td>
-                          <td className="px-6 py-4">Purchase</td>
-                          <td className="px-6 py-4 font-medium text-primary-text ">
-                            Ocean View Villa
-                          </td>
-                          <td className="px-6 py-4">1,500,000</td>
-                          <td className="px-6 py-4">
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                              Completed
-                            </span>
-                          </td>
-                        </tr>
-                        <tr className="bg-primary-bg border-b border-gray-200 0 hover:bg-secondary-bg">
-                          <td className="px-6 py-4">2023-10-24</td>
-                          <td className="px-6 py-4">Sale</td>
-                          <td className="px-6 py-4 font-medium text-primary-text ">
-                            Downtown Loft
-                          </td>
-                          <td className="px-6 py-4">950,000</td>
-                          <td className="px-6 py-4">
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                              Completed
-                            </span>
-                          </td>
-                        </tr>
-                        <tr className="bg-primary-bg border-b border-gray-200 over:bg-secondary-bg ">
-                          <td className="px-6 py-4">2023-10-22</td>
-                          <td className="px-6 py-4">Bid</td>
-                          <td className="px-6 py-4 font-medium text-primary-text ">
-                            Riverside Apartment
-                          </td>
-                          <td className="px-6 py-4">1,200,000</td>
-                          <td className="px-6 py-4">
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                              Pending
-                            </span>
-                          </td>
-                        </tr>
-                        <tr className="bg-primary-bg  hover:bg-secondary-bg">
-                          <td className="px-6 py-4">2023-10-20</td>
-                          <td className="px-6 py-4">Deposit</td>
-                          <td className="px-6 py-4 font-medium text-primary-text ">
-                            -
-                          </td>
-                          <td className="px-6 py-4">5,000,000</td>
-                          <td className="px-6 py-4">
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                              Failed
-                            </span>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                  <nav
-                    aria-label="Table navigation"
-                    className="flex items-center justify-between p-4 border-t border-gray-200"
-                  >
-                    <span className="text-sm font-normal text-secondary-text">
-                      Showing{" "}
-                      <span className="font-semibold text-primary-text">
-                        1-4
-                      </span>{" "}
-                      of{" "}
-                      <span className="font-semibold text-primary-text">
-                        100
-                      </span>
-                    </span>
-                    <ul className="inline-flex items-center -space-x-px">
-                      <li>
-                        <a
-                          className="px-3 py-2 ml-0 leading-tight text-secondary-text bg-primary-bg border border-gray-300 rounded-l-lg hover:bg-secondary-bg hover:text-primary-text"
-                          href="#"
-                        >
-                          Previous
-                        </a>
-                      </li>
-                      <li>
-                        <a
-                          className="px-3 py-2 leading-tight text-secondary-text bg-primary-bg border border-gray-300 hover:bg-secondary-bg hover:text-primary-text"
-                          href="#"
-                        >
-                          1
-                        </a>
-                      </li>
-                      <li>
-                        <a
-                          className="px-3 py-2 leading-tight text-primary-color bg-blue-100 border border-primary-color hover:bg-blue-200 hover:text-blue-800"
-                          href="#"
-                        >
-                          2
-                        </a>
-                      </li>
-                      <li>
-                        <a
-                          className="px-3 py-2 leading-tight text-secondary-text bg-primary-bg border border-gray-300 hover:bg-secondary-bg hover:text-primary-text"
-                          href="#"
-                        >
-                          3
-                        </a>
-                      </li>
-                      <li>
-                        <a
-                          className="px-3 py-2 leading-tight text-secondary-text bg-primary-bg border border-gray-300 rounded-r-lg hover:bg-secondary-bg hover:text-primary-text"
-                          href="#"
-                        >
-                          Next
-                        </a>
-                      </li>
-                    </ul>
-                  </nav>
-                </div>
-              </div>
+    <div className="bg-background font-sans text-foreground">
+      <div className="container mx-auto max-w-5xl py-12 px-4">
+        
+        {/* Profile Header */}
+        <div className="text-center mb-12">
+            <div className="relative inline-block mb-4">
+                <Jazzicon diameter={120} seed={currentAccount?.address} />
+                <div className="absolute bottom-1 right-1 bg-green-500 w-6 h-6 rounded-full border-4 border-background" title="Verified"></div>
             </div>
-          </main>
+            <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-foreground to-muted-foreground text-transparent bg-clip-text">{user.full_name}</h1>
+            <p className="text-muted-foreground mt-1 text-lg">{user.email}</p>
+            <div className="inline-flex items-center gap-2 mt-3 font-mono text-sm bg-card border border-border px-3 py-1.5 rounded-full">
+              <span>{trimAddress(currentAccount?.address)}</span>
+              <button
+                onClick={handleCopy}
+                className="p-1 rounded-full hover:bg-background transition-colors"
+                aria-label="Copy address"
+              >
+                <Copy size={14} className="text-muted-foreground" />
+              </button>
+            </div>
+        </div>
+
+        {/* Wallet Details Card */}
+        <div className="bg-card border border-border rounded-xl p-6 md:p-8 transition-all duration-300 shadow-lg hover:border-primary/50 hover:-translate-y-1 hover:shadow-[0_0_15px_var(--color-primary)] mb-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-primary/10 text-primary rounded-full flex items-center justify-center">
+                    <span className="font-bold text-2xl">I</span>
+                </div>
+                <div>
+                    <h3 className="text-lg font-bold text-left">IOTA Wallet</h3>
+                    <p className="text-muted-foreground text-sm text-left">Connected and verified.</p>
+                </div>
+            </div>
+            <button 
+              onClick={handleDisconnect}
+              className="flex items-center gap-2 bg-accent text-accent-foreground font-bold py-2.5 px-6 rounded-lg hover:bg-accent/80 transition-all duration-300 transform hover:scale-105 shadow-[0_0_15px_var(--color-accent)]"
+            >
+              <LogOut size={18} />
+              Disconnect
+            </button>
+        </div>
+
+        {/* Transaction History Card */}
+        <div className="bg-card border border-border rounded-xl shadow-lg transition-all duration-300 hover:border-primary/50 hover:-translate-y-1 hover:shadow-[0_0_15px_var(--color-primary)]">
+            <div className="p-6 border-b border-border">
+                <h3 className="text-xl font-bold">Transaction History</h3>
+                <p className="text-muted-foreground mt-1">A record of your activity on the platform.</p>
+            </div>
+            <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left">
+                <thead className="bg-background/50">
+                <tr className="border-b border-border">
+                    <th className="px-6 py-3 font-semibold">Date</th>
+                    <th className="px-6 py-3 font-semibold">Type</th>
+                    <th className="px-6 py-3 font-semibold">Property</th>
+                    <th className="px-6 py-3 font-semibold text-right">Amount (IOTA)</th>
+                    <th className="px-6 py-3 font-semibold text-center">Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                {/* Placeholder Data */}
+                <tr className="border-b border-border hover:bg-background/50">
+                    <td className="px-6 py-4 text-muted-foreground">2023-10-26</td>
+                    <td className="px-6 py-4">Purchase</td>
+                    <td className="px-6 py-4 font-medium text-foreground">Ocean View Villa</td>
+                    <td className="px-6 py-4 font-medium text-right">1,500,000</td>
+                    <td className="px-6 py-4 text-center">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/10 text-green-500">Completed</span>
+                    </td>
+                </tr>
+                <tr className="border-b border-border hover:bg-background/50">
+                    <td className="px-6 py-4 text-muted-foreground">2023-10-24</td>
+                    <td className="px-6 py-4">Sale</td>
+                    <td className="px-6 py-4 font-medium text-foreground">Downtown Loft</td>
+                    <td className="px-6 py-4 font-medium text-right">950,000</td>
+                    <td className="px-6 py-4 text-center">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/10 text-green-500">Completed</span>
+                    </td>
+                </tr>
+                <tr className="border-b border-border hover:bg-background/50">
+                    <td className="px-6 py-4 text-muted-foreground">2023-10-22</td>
+                    <td className="px-6 py-4">Bid</td>
+                    <td className="px-6 py-4 font-medium text-foreground">Riverside Apartment</td>
+                    <td className="px-6 py-4 font-medium text-right">1,200,000</td>
+                    <td className="px-6 py-4 text-center">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-500/10 text-yellow-500">Pending</span>
+                    </td>
+                </tr>
+                <tr className="hover:bg-background/50">
+                    <td className="px-6 py-4 text-muted-foreground">2023-10-20</td>
+                    <td className="px-6 py-4">Deposit</td>
+                    <td className="px-6 py-4 font-medium text-foreground">-</td>
+                    <td className="px-6 py-4 font-medium text-right">5,000,000</td>
+                    <td className="px-6 py-4 text-center">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-500/10 text-red-500">Failed</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            </div>
+            <div className="p-4 text-center border-t border-border">
+                <Link to="#" className="text-primary font-semibold hover:underline flex items-center justify-center gap-1">
+                    View All Transactions <ArrowRight size={16} />
+                </Link>
+            </div>
         </div>
       </div>
     </div>

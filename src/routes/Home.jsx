@@ -16,7 +16,7 @@ const Home = () => {
 
   useEffect(() => {
     if (currentAccount && registeredUserData && registeredUserData.length === 0) {
-      setIsKycModalOpen(true);
+      setIsKycModalOpen(false);
     }
   }, [currentAccount, registeredUserData]);
 
