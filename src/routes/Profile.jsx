@@ -17,7 +17,7 @@ const Profile = () => {
   };
 
   const user = registeredUserData[0];
-
+  console.log(registeredUserData)
   if (registeredUserData.length === 0) {
     return (
       <NotRegisteredState/>

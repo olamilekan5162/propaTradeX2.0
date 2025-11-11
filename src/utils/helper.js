@@ -11,6 +11,13 @@ export const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString(undefined, options);
 };
 
+export const formatFirstName = (name) => {
+  if (!name) return "";
+  const names = name.split(" ");
+  if (names.length === 1) return names[0];
+  return names[0];
+
+}
 const pinata = new PinataSDK({
   pinataJwt: import.meta.env.VITE_PINATA_JWT,
   pinataGateway: import.meta.env.VITE_PINATA_GATEWAY,
