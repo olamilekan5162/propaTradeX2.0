@@ -1,13 +1,19 @@
-import { ConnectButton } from "@iota/dapp-kit";
-import React from "react";
-import { NavLink } from "react-router-dom";
+import { ConnectButton, useCurrentAccount } from "@iota/dapp-kit";
+import React, { useEffect, useState } from "react";
+import { NavLink, useOutletContext } from "react-router-dom";
 
 const Navbar = () => {
+
+  const registeredUserData = useOutletContext()
+  const [isUser, setIsuser] = useState(false)
+   useEffect(() => {
+        
+    }, [registeredUserData]);
   return (
-    <header className="w-full bg-primary-bg  border-b border-solid border-gray-200  px-4 md:px-10 lg:px-40">
+    <header className="w-full bg-background  border-b border-solid border-border  px-4 md:px-10 lg:px-40">
       <div className="flex items-center justify-between whitespace-nowrap h-16 max-w-7xl mx-auto">
-        <div className="flex items-center gap-4 text-primary-text">
-          <div className="size-6 text-primary-color">
+        <div className="flex items-center gap-4 text-foreground">
+          <div className="size-6 text-primary">
             <svg
               fill="none"
               viewBox="0 0 48 48"
@@ -28,44 +34,36 @@ const Navbar = () => {
               </defs>
             </svg>
           </div>
-          <h2 className="text-primary-text text-lg font-bold leading-tight tracking-[-0.015em]">
+          <h2 className="text-foreground text-lg font-bold leading-tight tracking-[-0.015em]">
             PropaTradeX
           </h2>
         </div>
         <div className="hidden md:flex flex-1 justify-center gap-8">
           <NavLink
-            className="text-secondary-text text-sm font-medium leading-normal hover:text-primary "
-            to="/"
+            className="text-muted-foreground text-sm font-medium leading-normal hover:text-primary "
+            to="home"
           >
             Home
           </NavLink>
+        
+         
+          <>
           <NavLink
-            className="text-primary text-sm font-medium leading-normal"
-            to="kyc"
-          >
-            Kyc
-          </NavLink>
-          <NavLink
-            className="text-secondary-text text-sm font-medium leading-normal hover:text-primary "
+            className="text-muted-foreground text-sm font-medium leading-normal hover:text-primary "
             to="dashboard"
           >
             Dashboard
           </NavLink>
           <NavLink
-            className="text-secondary-text text-sm font-medium leading-normal hover:text-primary "
-            to="chats"
-          >
-            Messages
-          </NavLink>
-          <NavLink
-            className="text-secondary-text text-sm font-medium leading-normal hover:text-primary "
+            className="text-muted-foreground text-sm font-medium leading-normal hover:text-primary "
             to="upload"
           >
             Upload
           </NavLink>
+          </> 
         </div>
         <div className="flex items-center gap-4">
-          <ConnectButton className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary-color text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors" />
+          <ConnectButton className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-primary-foreground text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors" />
 
           <NavLink
             to={"profile"}

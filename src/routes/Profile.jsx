@@ -4,33 +4,29 @@ import { trimAddress } from "../utils/helper";
 import toast from "react-hot-toast";
 import Jazzicon from "react-jazzicon";
 import { useOutletContext } from "react-router-dom";
+import UnconnectedState from "../components/States/UnconnectedState";
+import NotRegisteredState from "../components/States/NotRegisteredState";
 
 const Profile = () => {
   const currentAccount = useCurrentAccount();
-  const RegisteredUserData = useOutletContext();
+  const registeredUserData = useOutletContext();
 
   const handleCopy = () => {
     navigator.clipboard.writeText(currentAccount?.address);
     toast("Copied");
   };
 
-  const user = RegisteredUserData[0];
+  const user = registeredUserData[0];
 
-  if (RegisteredUserData.length === 0) {
+  if (registeredUserData.length === 0) {
     return (
-      <div className="flex items-center justify-center h-screen bg-primary-bg text-primary-text">
-        <p className="text-lg">No profile data found. Please register first.</p>
-      </div>
+      <NotRegisteredState/>
     );
   }
 
   if (!currentAccount) {
     return (
-      <div className="flex items-center justify-center h-screen bg-primary-bg text-primary-text">
-        <p className="text-lg">
-          Please connect your wallet to view your profile.
-        </p>
-      </div>
+     <UnconnectedState />
     );
   }
 

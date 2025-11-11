@@ -9,13 +9,14 @@ import {
 import { useNetworkVariables } from "./config/networkConfig";
 import { Toaster } from "react-hot-toast";
 import { Transaction } from "@iota/iota-sdk/transactions";
+import UnconnectedState from "./components/States/UnconnectedState";
 
 function App() {
   const currentAccount = useCurrentAccount();
   const { propatradexPackageId, propatradexProfileRegistry } =
     useNetworkVariables("propatradexPackageId", "propatradexProfileRegistry");
 
-  const { data: RegisteredUserData } = useIotaClientQuery(
+  const { data: registeredUserData } = useIotaClientQuery(
     "queryEvents",
     {
       query: {
@@ -30,16 +31,21 @@ function App() {
     }
   );
 
-  console.log("RegisteredUserData:", RegisteredUserData);
+ 
+
+ 
 
   return (
     <>
       <Toaster position="top-center" />
       <Navbar />
-      <Outlet context={RegisteredUserData || []} />
+      {
+        currentAccount ? <Outlet context={registeredUserData || []} /> : <UnconnectedState />
+      }
+      
       <Footer />
     </>
-  );
+  )
 }
 
 export default App;

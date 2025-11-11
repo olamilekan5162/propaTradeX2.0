@@ -5,17 +5,17 @@ import Dashboard from "./routes/Dashboard";
 import Listing from "./routes/Listing";
 import Profile from "./routes/Profile";
 import Chat from "./routes/Chat";
-import KycPage from "./routes/KycPage";
 import UploadPage from "./routes/UploadPage";
+import LandingPage from "./routes/LandingPage";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
     children: [
-      { index: true, element: <Home /> },
+      { index: true, element: <LandingPage /> },
+      { path: "home", element: <Home /> },
       { path: "dashboard", element: <Dashboard /> },
-      { path: "kyc", element: <KycPage /> },
       { path: "listing/:id", element: <Listing /> },
       { path: "profile", element: <Profile /> },
       { path: "upload", element: <UploadPage /> },
