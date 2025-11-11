@@ -211,10 +211,152 @@ export const usePropertyhook = () => {
     }
   };
 
+  const raiseDispute = async (id, reason) => {
+    try {
+      const tx = new Transaction();
+
+      tx.moveCall({
+        arguments: [
+          tx.object(id),
+          tx.pure.string(reason),
+          tx.object("0x6"),
+        ],
+        target: `${propatradexPackageId}::propatradex::raise_dispute`,
+      });
+
+      const toastId = toast.loading("Processing...");
+
+      signAndExecute(
+        { transaction: tx },
+        {
+          onSuccess: async ({ digest }) => {
+            const { effects } = await iotaClient.waitForTransaction({
+              digest,
+              options: { showEffects: true },
+            });
+            if (effects?.status?.status === "success") {
+              toast.success("dispute submitted successfully!, Expect a feedback soon", { id: toastId });
+            } else {
+              toast.error(" failed, try again", {
+                id: toastId,
+              });
+            }
+            window.location.reload();
+          },
+          onError: (error) => {
+            toast.error(`failed, try again.`, {
+              id: toastId,
+            });
+            console.error(error.message);
+          },
+        }
+      );
+    } catch (error) {
+      toast.error("An unexpected error occurred", error.message);
+    }
+  };
+
+  const adminReleaseFund = async (escrow) => {
+    try {
+      const tx = new Transaction();
+
+      tx.moveCall({
+        arguments: [
+          tx.object(propatradexAdminCap),
+          tx.object(escrow.escrow_id),
+          tx.object(escrow.property_id),
+          tx.object(escrow.receiptId),
+          tx.object(escrow.receiptId),
+          tx.object("0x6"),
+        ],
+        target: `${propatradexPackageId}::propatradex::admin_resolve_dispute_release`,
+      });
+
+      const toastId = toast.loading("Processing...");
+
+      signAndExecute(
+        { transaction: tx },
+        {
+          onSuccess: async ({ digest }) => {
+            const { effects } = await iotaClient.waitForTransaction({
+              digest,
+              options: { showEffects: true },
+            });
+            if (effects?.status?.status === "success") {
+              toast.success("dispute submitted successfully!, Expect a feedback soon", { id: toastId });
+            } else {
+              toast.error(" failed, try again", {
+                id: toastId,
+              });
+            }
+            window.location.reload();
+          },
+          onError: (error) => {
+            toast.error(`failed, try again.`, {
+              id: toastId,
+            });
+            console.error(error.message);
+          },
+        }
+      );
+    } catch (error) {
+      toast.error("An unexpected error occurred", error.message);
+    }
+  };
+
+  const adminRefundFund = async (escrow) => {
+    try {
+      const tx = new Transaction();
+
+      tx.moveCall({
+        arguments: [
+          tx.object(propatradexAdminCap),
+          tx.object(escrow.escrow_id),
+          tx.object(escrow.property_id),
+          tx.object(escrow.receiptId),
+          tx.object(escrow.receiptId),
+          tx.object("0x6"),
+        ],
+        target: `${propatradexPackageId}::propatradex::admin_resolve_dispute_refund`,
+      });
+
+      const toastId = toast.loading("Processing...");
+
+      signAndExecute(
+        { transaction: tx },
+        {
+          onSuccess: async ({ digest }) => {
+            const { effects } = await iotaClient.waitForTransaction({
+              digest,
+              options: { showEffects: true },
+            });
+            if (effects?.status?.status === "success") {
+              toast.success("dispute submitted successfully!, Expect a feedback soon", { id: toastId });
+            } else {
+              toast.error(" failed, try again", {
+                id: toastId,
+              });
+            }
+            window.location.reload();
+          },
+          onError: (error) => {
+            toast.error(`failed, try again.`, {
+              id: toastId,
+            });
+            console.error(error.message);
+          },
+        }
+      );
+    } catch (error) {
+      toast.error("An unexpected error occurred", error.message);
+    }
+  };
+
   return {
     registerUser,
     buyOrRentProperty,
     buyerOrRenterConfirm,
     sellerOrLandlordConfirm,
+    raiseDispute
   };
 };
