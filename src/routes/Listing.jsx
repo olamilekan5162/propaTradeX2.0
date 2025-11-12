@@ -13,6 +13,7 @@ import {
   Share2,
   Heart,
   AlertCircle,
+  X,
 } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import { usePropertyhook } from "../hooks/usePropertyHook";
@@ -36,17 +37,14 @@ const Listing = () => {
   );
 
   const handleBuyorRent = async (property) => {
-    try {
-      toast.loading(isForSale ? "Processing purchase..." : "Processing rental...");
+   
       await buyOrRentProperty(property);
-      toast.dismiss();
-      toast.success(isForSale ? "Property purchased successfully!" : "Property rented successfully!");
-    } catch (error) {
-      toast.dismiss();
-      toast.error("Transaction failed. Please try again.");
-      console.error(error);
-    }
   };
+
+  const handleRaiseDispute = async (property) => {
+   
+    await buyOrRentProperty(property);
+};
 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -259,10 +257,20 @@ const Listing = () => {
               {/* Status Badge */}
               <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold text-muted-foreground">Status</span>
-                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-green-500/10 text-green-500 border border-green-500/20">
-                  <CheckCircle size={14} />
-                  Available
-                </span>
+                {
+                  property?.status === 1 ? (
+                    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-green-500/10 text-green-500 border border-green-500/20">
+                    <CheckCircle size={14} />
+                    Available
+                  </span>) 
+                  :(
+                    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-red-500/10 text-red-500 border border-red-500/20">
+                    <X size={14} />
+                    Unavailabe
+                  </span>) 
+                  
+                }
+               
               </div>
 
               {/* Action Button */}
@@ -270,6 +278,7 @@ const Listing = () => {
                 {isForSale ? (
                   <button
                     onClick={() => handleBuyorRent(property)}
+                    disabled={property?.status !== 1}
                     className="w-full py-4 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/80 transition-all duration-300 transform hover:scale-105 shadow-[0_0_20px_var(--color-primary)]"
                   >
                     Buy Property
@@ -277,6 +286,7 @@ const Listing = () => {
                 ) : (
                   <button
                     onClick={() => handleBuyorRent(property)}
+                    disabled={property?.status !== 1}
                     className="w-full py-4 bg-accent text-accent-foreground font-bold rounded-lg hover:bg-accent/80 transition-all duration-300 transform hover:scale-105 shadow-[0_0_20px_var(--color-accent)]"
                   >
                     Rent Property

@@ -38,7 +38,7 @@ function App() {
   return (
     <>
       <Toaster position="top-center" />
-      <Navbar />
+      <Navbar registeredUserData={registeredUserData} />
       {
         currentAccount ? <Outlet context={registeredUserData || []} /> : <UnconnectedState />
       }

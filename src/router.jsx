@@ -7,6 +7,7 @@ import Profile from "./routes/Profile";
 import Chat from "./routes/Chat";
 import UploadPage from "./routes/UploadPage";
 import LandingPage from "./routes/LandingPage";
+import Admin from "./routes/Admin";
 
 export const router = createBrowserRouter([
   {
@@ -20,6 +21,7 @@ export const router = createBrowserRouter([
       { path: "profile", element: <Profile /> },
       { path: "upload", element: <UploadPage /> },
       { path: "chats", element: <Chat /> },
+      { path: "admin", element: <Admin /> },
     ],
   },
 ]);

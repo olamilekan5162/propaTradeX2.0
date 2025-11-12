@@ -1,16 +1,10 @@
 import { ConnectButton, useCurrentAccount } from "@iota/dapp-kit";
 import React, { useEffect, useState } from "react";
+import Jazzicon from "react-jazzicon";
 import { NavLink, useOutletContext } from "react-router-dom";
 
-const Navbar = () => {
-
-
-
-  const registeredUserData = useOutletContext()
-  const [isUser, setIsuser] = useState(false)
-   useEffect(() => {
-        
-    }, [registeredUserData]);
+const Navbar = ({registeredUserData}) => {
+ 
   return (
     <header className="w-full bg-background  border-b border-solid border-border  px-4 md:px-10 lg:px-40">
       <div className="flex items-center justify-between whitespace-nowrap h-16 max-w-7xl mx-auto">
@@ -48,7 +42,8 @@ const Navbar = () => {
             Home
           </NavLink>
         
-         
+         {registeredUserData && registeredUserData.length > 0 &&
+
           <>
           <NavLink
             className="text-muted-foreground text-sm font-medium leading-normal hover:text-primary "
@@ -63,6 +58,14 @@ const Navbar = () => {
             Upload
           </NavLink>
           </> 
+         }
+         <NavLink
+            className="text-muted-foreground text-sm font-medium leading-normal hover:text-primary "
+            to="admin"
+          >
+            Admin
+          </NavLink>
+
         </div>
         <div className="flex items-center gap-4">
           <ConnectButton className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-primary-foreground text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors" />
@@ -70,11 +73,10 @@ const Navbar = () => {
           <NavLink
             to={"profile"}
             className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
-            style={{
-              backgroundImage:
-                'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDpnTCpM1kz8XGj2WvIaiJ3Cr8CF988I6uX5Y3O14aQ5IIHb13PwdmQFWHODryRlP58UeFAl75Ap7lS6Wgj7c0FXh3Rr0d37AikupOrU36s34Znzd1E8mn46tAY3D7ZyVEKJBRQCirfiKZmWHMDSP5UTjMWLb02Uck59AKofz3ugzxuNOIL86ZYkVE28Wfs82YMgpm13Lrlbp0q5GK7McEfcbRyPrpAr6yfCWbmXQoaUC_xEWCL9EVEThKX9790t7D-0cpFz5T6Mw")',
-            }}
-          ></NavLink>
+            
+          >
+            <Jazzicon diameter={40}/>
+          </NavLink>
         </div>
       </div>
     </header>
