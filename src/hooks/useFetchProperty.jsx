@@ -36,12 +36,9 @@ export const useFetchProperty = () => {
   );
 
   useEffect(() => {
-    console.log("fetching...");
-
+    
     if (!isPending && propertyObject) {
       setPropertyDetails(propertyObject);
-      console.log("propertyDetails:", propertyObject);
-      console.log("fetched");
     }
     if (isError) {
       console.error("Error fetching property details");

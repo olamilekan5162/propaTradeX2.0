@@ -7,17 +7,19 @@ import Hero from "../components/Hero";
 import { useFetchProperty } from "../hooks/useFetchProperty";
 
 const Home = () => {
-  const { registeredUserData } = useOutletContext();
+  const registeredUserData  = useOutletContext();
   const { propertyDetails, isPending } = useFetchProperty();
-  const [isKycModalOpen, setIsKycModalOpen] = useState(true);
+  const [isKycModalOpen, setIsKycModalOpen] = useState(false);
   const currentAccount = useCurrentAccount();
   const [propertyType, setPropertyType] = useState("");
   const [priceRange, setPriceRange] = useState("");
 
   useEffect(() => {
-    if (currentAccount && registeredUserData && registeredUserData.length === 0) {
-      setIsKycModalOpen(false);
+    if (currentAccount && registeredUserData.length === 0) {
+      setIsKycModalOpen(true);
     }
+   
+    
   }, [currentAccount, registeredUserData]);
 
   const closeModal = () => {
