@@ -258,15 +258,15 @@ export const usePropertyhook = () => {
     }
   };
 
-  const adminReleaseFund = async (escrow) => {
+  const adminReleaseFund = async (escrowId, propertyId) => {
     try {
       const tx = new Transaction();
 
       tx.moveCall({
         arguments: [
           tx.object(propatradexAdminCap),
-          tx.object(escrow.escrow_id),
-          tx.object(escrow.property_id),
+          tx.object(escrowId),
+          tx.object(propertyId),
           tx.object("0x6"),
         ],
         target: `${propatradexPackageId}::propatradex::admin_resolve_dispute_release`,
@@ -304,15 +304,15 @@ export const usePropertyhook = () => {
     }
   };
 
-  const adminRefundFund = async (escrow) => {
+  const adminRefundFund = async (escrowId, propertyId) => {
     try {
       const tx = new Transaction();
 
       tx.moveCall({
         arguments: [
           tx.object(propatradexAdminCap),
-          tx.object(escrow.escrow_id),
-          tx.object(escrow.property_id),
+          tx.object(escrowId),
+          tx.object(propertyId),
           tx.object("0x6"),
         ],
         target: `${propatradexPackageId}::propatradex::admin_resolve_dispute_refund`,
@@ -347,6 +347,7 @@ export const usePropertyhook = () => {
       );
     } catch (error) {
       toast.error("An unexpected error occurred", error.message);
+      console.log("An unexpected error occurred", error);
     }
   };
 

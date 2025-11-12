@@ -124,7 +124,7 @@ export default function Admin() {
                 <h2 className="text-2xl font-semibold mb-4 text-[var(--color-foreground)]">
                   Active Disputes
                 </h2>
-                <DisputeList />
+                <DisputeList disputes={enrichedDisputes}/>
               </div>
             )}
 
