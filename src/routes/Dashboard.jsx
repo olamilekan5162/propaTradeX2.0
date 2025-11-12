@@ -1,4 +1,12 @@
-import { Search, Building, KeyRound, Briefcase, TrendingUp, Filter, X } from "lucide-react";
+import {
+  Search,
+  Building,
+  KeyRound,
+  Briefcase,
+  TrendingUp,
+  Filter,
+  X,
+} from "lucide-react";
 import { useState, useMemo } from "react";
 import { useNetworkVariables } from "../config/networkConfig";
 import { useCurrentAccount, useIotaClientQuery } from "@iota/dapp-kit";
@@ -14,7 +22,8 @@ const Dashboard = () => {
   const currentAccount = useCurrentAccount();
   const { propatradexPackageId } = useNetworkVariables("propatradexPackageId");
   const registeredUserData = useOutletContext();
-  const { propertyDetails: properties, isPending: isPropertiesPending } = useFetchProperty();
+  const { propertyDetails: properties, isPending: isPropertiesPending } =
+    useFetchProperty();
 
   const { data: escrowData, isPending: isEscrowPending } = useIotaClientQuery(
     "queryEvents",
@@ -34,7 +43,6 @@ const Dashboard = () => {
           ),
     }
   );
-
 
   const { data: receipts, isPending: isReceiptPending } = useIotaClientQuery(
     "getOwnedObjects",
@@ -64,10 +72,10 @@ const Dashboard = () => {
       );
 
       const {
-        property_id,
-        listing_type,
-        seller_landlord_address,
-        buyer_renter_address,
+        _property_id,
+        _listing_type,
+        _seller_landlord_address,
+        _buyer_renter_address,
         ...receiptRest
       } = myReceipt || {};
 
@@ -80,61 +88,78 @@ const Dashboard = () => {
       };
     });
   }, [escrowData, receipts, currentAccount?.address]);
-  
+
   const ownedProperties = useMemo(() => {
-    if (!properties || !receipts) return [];
-    const ownedPropertyIds = new Set(receipts.map(r => r.property_id));
-    return properties.filter(p => ownedPropertyIds.has(p.id.id));
-  }, [properties, receipts]);
+    if (!properties) return [];
+
+    // const ownedPropertyIds = new Set(receipts.map((r) => r.property_id));
+
+    // This checks if the connected user is the owner or is the locker
+    const ownedPropertyIds = properties.filter(
+      (property) =>
+        (property.owner === currentAccount?.address &&
+          (property.locked_by === currentAccount?.address ||
+            property?.locked_by === null)) ||
+        (property.listing_type === 1 &&
+          property.locked_by === currentAccount?.address)
+    );
+    return ownedPropertyIds;
+  }, [properties, currentAccount?.address]);
 
   const filteredOwnedProperties = useMemo(() => {
     if (!searchTerm) return ownedProperties;
-    return ownedProperties.filter(p => 
-      p.property_address.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.property_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.price.toString().includes(searchTerm)
+    return ownedProperties.filter(
+      (p) =>
+        p.property_address.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.property_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.price.toString().includes(searchTerm)
     );
   }, [ownedProperties, searchTerm]);
 
   const filteredEscrows = useMemo(() => {
     if (!searchTerm) return enrichedEscrows;
-    return enrichedEscrows.filter(e =>
-      e.property_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      e.property_address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      e.property_id.toLowerCase().includes(searchTerm.toLowerCase())
+    return enrichedEscrows.filter(
+      (e) =>
+        e.property_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        e.property_address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        e.property_id.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [enrichedEscrows, searchTerm]);
 
   const isPending = isEscrowPending || isReceiptPending || isPropertiesPending;
 
   const stats = [
-    { 
-      name: "Total Properties Owned", 
-      value: ownedProperties.length, 
+    {
+      name: "Total Properties Owned",
+      value: ownedProperties.length,
       icon: Building,
       trend: "+2 this month",
-      color: "primary"
+      color: "primary",
     },
-    { 
-      name: "Properties in Escrow", 
-      value: enrichedEscrows.length, 
+    {
+      name: "Properties in Escrow",
+      value: enrichedEscrows.length,
       icon: Briefcase,
-      trend: `${enrichedEscrows.filter(e => e.isBuyer).length} as buyer`,
-      color: "accent"
+      trend: `${enrichedEscrows.filter((e) => e.isBuyer).length} as buyer`,
+      color: "accent",
     },
-    { 
-      name: "Properties for Rent", 
-      value: ownedProperties.filter(p => p.listing_type === '2').length, 
+    {
+      name: "Properties for Rent",
+      value: ownedProperties.filter((p) => p.listing_type === "2").length,
       icon: KeyRound,
       trend: "Active listings",
-      color: "chart-2"
+      color: "chart-2",
     },
   ];
 
   const tabConfig = [
-    { id: 'owned', label: 'My Properties', count: filteredOwnedProperties.length },
-    { id: 'listed', label: 'Listed', count: 0 },
-    { id: 'escrow', label: 'In Escrow', count: filteredEscrows.length },
+    {
+      id: "owned",
+      label: "My Properties",
+      count: filteredOwnedProperties.length,
+    },
+    { id: "listed", label: "Listed", count: 0 },
+    { id: "escrow", label: "In Escrow", count: filteredEscrows.length },
   ];
 
   return (
@@ -145,15 +170,21 @@ const Dashboard = () => {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h1 className="text-3xl lg:text-4xl font-bold tracking-tight bg-gradient-to-r from-foreground to-muted-foreground text-transparent bg-clip-text">
-                Welcome Back, {formatFirstName(registeredUserData[0]?.full_name)}!
+                Welcome Back,{" "}
+                {formatFirstName(registeredUserData[0]?.full_name)}!
               </h1>
-              <p className="text-muted-foreground mt-2">Manage your property portfolio and track transactions</p>
+              <p className="text-muted-foreground mt-2">
+                Manage your property portfolio and track transactions
+              </p>
             </div>
             <div className="flex items-center gap-3">
               <div className="px-4 py-2 bg-primary/10 text-primary rounded-lg border border-primary/20">
                 <p className="text-xs font-medium">Portfolio Value</p>
                 <p className="text-xl font-bold">
-                  {ownedProperties.reduce((sum, p) => sum + Number(p.price), 0).toLocaleString()} IOTA
+                  {ownedProperties
+                    .reduce((sum, p) => sum + Number(p.price), 0)
+                    .toLocaleString()}{" "}
+                  IOTA
                 </p>
               </div>
             </div>
@@ -165,18 +196,22 @@ const Dashboard = () => {
         {/* Stats Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           {stats.map((stat, index) => (
-            <div 
-              key={index} 
+            <div
+              key={index}
               className="bg-card border border-border rounded-xl p-6 transition-all duration-300 shadow-lg hover:border-primary/50 hover:shadow-[0_0_20px_var(--color-primary)] group"
             >
               <div className="flex items-start justify-between mb-4">
-                <div className={`w-14 h-14 bg-${stat.color}/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+                <div
+                  className={`w-14 h-14 bg-${stat.color}/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
+                >
                   <stat.icon className={`h-7 w-7 text-${stat.color}`} />
                 </div>
                 <TrendingUp className="text-green-500" size={20} />
               </div>
               <p className="text-3xl font-bold mb-1">{stat.value}</p>
-              <p className="text-muted-foreground text-sm font-medium mb-2">{stat.name}</p>
+              <p className="text-muted-foreground text-sm font-medium mb-2">
+                {stat.name}
+              </p>
               <p className="text-xs text-green-500 font-medium">{stat.trend}</p>
             </div>
           ))}
@@ -199,11 +234,13 @@ const Dashboard = () => {
                 >
                   {tab.label}
                   {tab.count > 0 && (
-                    <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-bold ${
-                      activeTab === tab.id 
-                        ? "bg-primary-foreground/20 text-primary-foreground" 
-                        : "bg-primary/10 text-primary"
-                    }`}>
+                    <span
+                      className={`ml-2 px-2 py-0.5 rounded-full text-xs font-bold ${
+                        activeTab === tab.id
+                          ? "bg-primary-foreground/20 text-primary-foreground"
+                          : "bg-primary/10 text-primary"
+                      }`}
+                    >
                       {tab.count}
                     </span>
                   )}
@@ -213,7 +250,10 @@ const Dashboard = () => {
 
             {/* Search Bar */}
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
+              <Search
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+                size={20}
+              />
               <input
                 type="text"
                 placeholder={`Search ${activeTab} properties...`}
@@ -236,10 +276,21 @@ const Dashboard = () => {
           {searchTerm && (
             <div className="mt-4 pt-4 border-t border-border">
               <p className="text-sm text-muted-foreground">
-                Found <span className="font-bold text-primary">
-                  {activeTab === 'owned' ? filteredOwnedProperties.length : 
-                   activeTab === 'escrow' ? filteredEscrows.length : 0}
-                </span> result{(activeTab === 'owned' ? filteredOwnedProperties.length : filteredEscrows.length) !== 1 ? 's' : ''} for "{searchTerm}"
+                Found{" "}
+                <span className="font-bold text-primary">
+                  {activeTab === "owned"
+                    ? filteredOwnedProperties.length
+                    : activeTab === "escrow"
+                    ? filteredEscrows.length
+                    : 0}
+                </span>{" "}
+                result
+                {(activeTab === "owned"
+                  ? filteredOwnedProperties.length
+                  : filteredEscrows.length) !== 1
+                  ? "s"
+                  : ""}{" "}
+                for "{searchTerm}"
               </p>
             </div>
           )}
@@ -250,7 +301,10 @@ const Dashboard = () => {
           {isPending ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-card border border-border rounded-xl h-96 animate-pulse"></div>
+                <div
+                  key={i}
+                  className="bg-card border border-border rounded-xl h-96 animate-pulse"
+                ></div>
               ))}
             </div>
           ) : (
@@ -266,12 +320,17 @@ const Dashboard = () => {
                   ) : (
                     <div className="text-center py-16">
                       <div className="bg-card border border-border rounded-xl p-12">
-                        <Building className="mx-auto mb-4 text-muted-foreground" size={48} />
+                        <Building
+                          className="mx-auto mb-4 text-muted-foreground"
+                          size={48}
+                        />
                         <h3 className="text-xl font-bold mb-2">
-                          {searchTerm ? "No Properties Found" : "No Properties Yet"}
+                          {searchTerm
+                            ? "No Properties Found"
+                            : "No Properties Yet"}
                         </h3>
                         <p className="text-muted-foreground mb-6">
-                          {searchTerm 
+                          {searchTerm
                             ? "Try adjusting your search terms"
                             : "Start building your portfolio by purchasing properties"}
                         </p>
@@ -292,8 +351,13 @@ const Dashboard = () => {
               {activeTab === "listed" && (
                 <div className="text-center py-16">
                   <div className="bg-card border border-border rounded-xl p-12">
-                    <KeyRound className="mx-auto mb-4 text-muted-foreground" size={48} />
-                    <h3 className="text-xl font-bold mb-2">No Listed Properties</h3>
+                    <KeyRound
+                      className="mx-auto mb-4 text-muted-foreground"
+                      size={48}
+                    />
+                    <h3 className="text-xl font-bold mb-2">
+                      No Listed Properties
+                    </h3>
                     <p className="text-muted-foreground mb-6">
                       List your properties to start earning rental income
                     </p>
@@ -312,9 +376,14 @@ const Dashboard = () => {
                   ) : (
                     <div className="text-center py-16">
                       <div className="bg-card border border-border rounded-xl p-12">
-                        <Briefcase className="mx-auto mb-4 text-muted-foreground" size={48} />
+                        <Briefcase
+                          className="mx-auto mb-4 text-muted-foreground"
+                          size={48}
+                        />
                         <h3 className="text-xl font-bold mb-2">
-                          {searchTerm ? "No Escrow Transactions Found" : "No Active Escrow"}
+                          {searchTerm
+                            ? "No Escrow Transactions Found"
+                            : "No Active Escrow"}
                         </h3>
                         <p className="text-muted-foreground mb-6">
                           {searchTerm

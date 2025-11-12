@@ -37,14 +37,12 @@ const Listing = () => {
   );
 
   const handleBuyorRent = async (property) => {
-   
-      await buyOrRentProperty(property);
+    await buyOrRentProperty(property);
   };
 
-  const handleRaiseDispute = async (property) => {
-   
-    await buyOrRentProperty(property);
-};
+  // const handleRaiseDispute = async (property) => {
+  //   await buyOrRentProperty(property);
+  // };
 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -68,7 +66,9 @@ const Listing = () => {
         <div className="text-center">
           <AlertCircle className="mx-auto mb-4 text-red-500" size={48} />
           <p className="text-xl font-semibold mb-2">Property Not Found</p>
-          <p className="text-muted-foreground mb-4">The property you're looking for doesn't exist.</p>
+          <p className="text-muted-foreground mb-4">
+            The property you're looking for doesn't exist.
+          </p>
           <button
             onClick={() => navigate("/dashboard")}
             className="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/80 transition-all"
@@ -115,7 +115,10 @@ const Listing = () => {
             <div
               className="w-full bg-center bg-cover rounded-xl overflow-hidden h-[400px] lg:h-[500px] border border-border shadow-lg"
               style={{
-                backgroundImage: `url("${property?.images_cids[selectedImage] || property?.images_cids[0]}")`,
+                backgroundImage: `url("${
+                  property?.images_cids[selectedImage] ||
+                  property?.images_cids[0]
+                }")`,
               }}
             ></div>
           </div>
@@ -221,16 +224,28 @@ const Listing = () => {
                 <h3 className="text-2xl font-bold mb-4">Rental Information</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="bg-background/50 rounded-lg p-4 border border-border">
-                    <p className="text-xs text-muted-foreground mb-1">Monthly Rent</p>
-                    <p className="text-xl font-bold">{property?.monthly_rent || "N/A"} IOTA</p>
+                    <p className="text-xs text-muted-foreground mb-1">
+                      Monthly Rent
+                    </p>
+                    <p className="text-xl font-bold">
+                      {property?.monthly_rent || "N/A"} IOTA
+                    </p>
                   </div>
                   <div className="bg-background/50 rounded-lg p-4 border border-border">
-                    <p className="text-xs text-muted-foreground mb-1">Rental Period</p>
-                    <p className="text-xl font-bold">{property?.rental_period_months} months</p>
+                    <p className="text-xs text-muted-foreground mb-1">
+                      Rental Period
+                    </p>
+                    <p className="text-xl font-bold">
+                      {property?.rental_period_months} months
+                    </p>
                   </div>
                   <div className="bg-background/50 rounded-lg p-4 border border-border">
-                    <p className="text-xs text-muted-foreground mb-1">Deposit</p>
-                    <p className="text-xl font-bold">{property?.deposit_required || "0"} IOTA</p>
+                    <p className="text-xs text-muted-foreground mb-1">
+                      Deposit
+                    </p>
+                    <p className="text-xl font-bold">
+                      {property?.deposit_required || "0"} IOTA
+                    </p>
                   </div>
                 </div>
               </div>
@@ -256,21 +271,20 @@ const Listing = () => {
             <div className="sticky top-24 bg-card border border-border rounded-xl p-6 shadow-lg space-y-6">
               {/* Status Badge */}
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-muted-foreground">Status</span>
-                {
-                  property?.status === 1 ? (
-                    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-green-500/10 text-green-500 border border-green-500/20">
+                <span className="text-sm font-semibold text-muted-foreground">
+                  Status
+                </span>
+                {property?.status === 1 ? (
+                  <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-green-500/10 text-green-500 border border-green-500/20">
                     <CheckCircle size={14} />
                     Available
-                  </span>) 
-                  :(
-                    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-red-500/10 text-red-500 border border-red-500/20">
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-red-500/10 text-red-500 border border-red-500/20">
                     <X size={14} />
                     Unavailabe
-                  </span>) 
-                  
-                }
-               
+                  </span>
+                )}
               </div>
 
               {/* Action Button */}
@@ -279,7 +293,7 @@ const Listing = () => {
                   <button
                     onClick={() => handleBuyorRent(property)}
                     disabled={property?.status !== 1}
-                    className="w-full py-4 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/80 transition-all duration-300 transform hover:scale-105 shadow-[0_0_20px_var(--color-primary)]"
+                    className="w-full py-4 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/80 transition-all duration-300 transform hover:scale-105 shadow-[0_0_20px_var(--color-primary)] disabled:bg-gray-300 disabled:shadow-none"
                   >
                     Buy Property
                   </button>
@@ -299,7 +313,7 @@ const Listing = () => {
                 <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider">
                   Blockchain Details
                 </h4>
-                
+
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">Property ID</span>
@@ -307,19 +321,19 @@ const Listing = () => {
                       {property?.id?.id?.slice(0, 8)}...
                     </span>
                   </div>
-                  
+
                   <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">Owner</span>
                     <span className="font-mono text-xs bg-secondary px-2 py-1 rounded">
                       {property?.owner?.slice(0, 8)}...
                     </span>
                   </div>
-                  
+
                   <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">Network</span>
                     <span className="font-semibold text-primary">IOTA</span>
                   </div>
-                  
+
                   <div className="flex justify-between items-center pt-2 border-t border-border">
                     <span className="text-muted-foreground">Explorer</span>
                     <a
