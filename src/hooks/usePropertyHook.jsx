@@ -1,17 +1,12 @@
 import toast from "react-hot-toast";
 import { useNetworkVariables } from "../config/networkConfig";
 import { Transaction } from "@iota/iota-sdk/transactions";
-import {
-  useCurrentAccount,
-  useIotaClient,
-  useSignAndExecuteTransaction,
-} from "@iota/dapp-kit";
+import { useIotaClient, useSignAndExecuteTransaction } from "@iota/dapp-kit";
 
 export const usePropertyhook = () => {
   const {
     propatradexPackageId,
     propatradexAdminCap,
-    propatradexUpgradeCap,
     propatradexProfileRegistry,
   } = useNetworkVariables(
     "propatradexPackageId",
@@ -22,9 +17,8 @@ export const usePropertyhook = () => {
 
   const iotaClient = useIotaClient();
   const { mutate: signAndExecute } = useSignAndExecuteTransaction();
-  const currentAccount = useCurrentAccount();
 
-  const registerUser = async (userData) => {
+  const registerUser = async (userData, callback) => {
     try {
       const tx = new Transaction();
       tx.moveCall({
@@ -51,13 +45,13 @@ export const usePropertyhook = () => {
               options: { showEffects: true },
             });
             if (effects?.status?.status === "success") {
+              callback();
               toast.success("Registration successfully", { id: toastId });
-              console.log("successfull")
             } else {
               toast.error("Registration failed, try again", {
                 id: toastId,
               });
-              console.log("successfull")
+              console.log("successfull");
             }
             window.location.reload();
           },
@@ -218,11 +212,7 @@ export const usePropertyhook = () => {
       const tx = new Transaction();
 
       tx.moveCall({
-        arguments: [
-          tx.object(id),
-          tx.pure.string(reason),
-          tx.object("0x6"),
-        ],
+        arguments: [tx.object(id), tx.pure.string(reason), tx.object("0x6")],
         target: `${propatradexPackageId}::propatradex::raise_dispute`,
       });
 
@@ -237,7 +227,10 @@ export const usePropertyhook = () => {
               options: { showEffects: true },
             });
             if (effects?.status?.status === "success") {
-              toast.success("dispute submitted successfully!, Expect a feedback soon", { id: toastId });
+              toast.success(
+                "dispute submitted successfully!, Expect a feedback soon",
+                { id: toastId }
+              );
             } else {
               toast.error(" failed, try again", {
                 id: toastId,
@@ -283,7 +276,10 @@ export const usePropertyhook = () => {
               options: { showEffects: true },
             });
             if (effects?.status?.status === "success") {
-              toast.success("dispute submitted successfully!, Expect a feedback soon", { id: toastId });
+              toast.success(
+                "dispute submitted successfully!, Expect a feedback soon",
+                { id: toastId }
+              );
             } else {
               toast.error(" failed, try again", {
                 id: toastId,
@@ -329,7 +325,10 @@ export const usePropertyhook = () => {
               options: { showEffects: true },
             });
             if (effects?.status?.status === "success") {
-              toast.success("dispute submitted successfully!, Expect a feedback soon", { id: toastId });
+              toast.success(
+                "dispute submitted successfully!, Expect a feedback soon",
+                { id: toastId }
+              );
             } else {
               toast.error(" failed, try again", {
                 id: toastId,
@@ -358,6 +357,6 @@ export const usePropertyhook = () => {
     sellerOrLandlordConfirm,
     raiseDispute,
     adminRefundFund,
-    adminReleaseFund
+    adminReleaseFund,
   };
 };

@@ -1,15 +1,14 @@
 import { ConnectButton, useCurrentAccount } from "@iota/dapp-kit";
-import React, { useEffect, useState } from "react";
 import Jazzicon from "react-jazzicon";
-import { NavLink, useOutletContext } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
-const Navbar = ({registeredUserData}) => {
-  const currentAccount = useCurrentAccount()
- 
+const Navbar = ({ registeredUserData }) => {
+  const currentAccount = useCurrentAccount();
+
   return (
     <header className="w-full bg-background  border-b border-solid border-border  px-4 md:px-10 lg:px-40">
       <div className="flex items-center justify-between whitespace-nowrap h-16 max-w-7xl mx-auto">
-        <div className="flex items-center gap-4 text-foreground">
+        <Link to={"/"} className="flex items-center gap-4 text-foreground">
           <div className="size-6 text-primary">
             <svg
               fill="none"
@@ -34,7 +33,7 @@ const Navbar = ({registeredUserData}) => {
           <h2 className="text-foreground text-lg font-bold leading-tight tracking-[-0.015em]">
             PropaTradeX
           </h2>
-        </div>
+        </Link>
         <div className="hidden md:flex flex-1 justify-center gap-8">
           <NavLink
             className="text-muted-foreground text-sm font-medium leading-normal hover:text-primary "
@@ -42,35 +41,33 @@ const Navbar = ({registeredUserData}) => {
           >
             Explore
           </NavLink>
-        
-         {registeredUserData && registeredUserData.length > 0 &&
 
-          <>
-          <NavLink
-            className="text-muted-foreground text-sm font-medium leading-normal hover:text-primary "
-            to="dashboard"
-          >
-            Dashboard
-          </NavLink>
-          <NavLink
-            className="text-muted-foreground text-sm font-medium leading-normal hover:text-primary "
-            to="upload"
-          >
-            Upload
-          </NavLink>
-          </> 
-         }
+          {registeredUserData && registeredUserData.length > 0 && (
+            <>
+              <NavLink
+                className="text-muted-foreground text-sm font-medium leading-normal hover:text-primary "
+                to="dashboard"
+              >
+                Dashboard
+              </NavLink>
+              <NavLink
+                className="text-muted-foreground text-sm font-medium leading-normal hover:text-primary "
+                to="upload"
+              >
+                Upload
+              </NavLink>
+            </>
+          )}
 
-         {currentAccount?.address === "0xfff6cfb02d8b81e1ab2195ce4c7361274575c386bdfb638269a416db1b6aefb9" &&
-
-         <NavLink
-            className="text-muted-foreground text-sm font-medium leading-normal hover:text-primary "
-            to="admin"
-          >
-            Admin
-          </NavLink>
-         }
-
+          {currentAccount?.address !==
+            "0xfff6cfb02d8b81e1ab2195ce4c7361274575c386bdfb638269a416db1b6aefb9" && (
+            <NavLink
+              className="text-muted-foreground text-sm font-medium leading-normal hover:text-primary "
+              to="admin"
+            >
+              Admin
+            </NavLink>
+          )}
         </div>
         <div className="flex items-center gap-4">
           <ConnectButton className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-primary-foreground text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors" />
@@ -78,9 +75,8 @@ const Navbar = ({registeredUserData}) => {
           <NavLink
             to={"profile"}
             className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
-            
           >
-            <Jazzicon diameter={40}/>
+            <Jazzicon diameter={40} />
           </NavLink>
         </div>
       </div>

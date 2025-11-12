@@ -2,7 +2,6 @@ import toast from "react-hot-toast";
 import { useNetworkVariables } from "../config/networkConfig";
 import { Transaction } from "@iota/iota-sdk/transactions";
 import {
-  useCurrentAccount,
   useIotaClient,
   useSignAndExecuteTransaction,
 } from "@iota/dapp-kit";
@@ -10,9 +9,6 @@ import {
 export const usePropertyUpload = () => {
   const {
     propatradexPackageId,
-    propatradexAdminCap,
-    propatradexUpgradeCap,
-    propatradexProfileRegistry,
   } = useNetworkVariables(
     "propatradexPackageId",
     "propatradexAdminCap",
@@ -22,7 +18,6 @@ export const usePropertyUpload = () => {
 
   const iotaClient = useIotaClient();
   const { mutate: signAndExecute } = useSignAndExecuteTransaction();
-  const currentAccount = useCurrentAccount();
 
   const uploadProperty = async (listingType, formData, cids, toastId) => {
     if (!formData || !cids) {

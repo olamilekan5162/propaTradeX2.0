@@ -18,15 +18,19 @@ export default function KycModal({ closeModal }) {
     setUserData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async () => {
-    await registerUser(userData);
-    closeModal();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await registerUser(userData, closeModal);
+    // closeModal();
   };
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
       <div className="bg-card text-card-foreground rounded-lg shadow-lg max-w-2xl w-full p-6 sm:p-8 relative">
-        <button onClick={closeModal} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground">
+        <button
+          onClick={closeModal}
+          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
+        >
           <X size={24} />
         </button>
         <div className="mb-8 text-center">
@@ -38,7 +42,7 @@ export default function KycModal({ closeModal }) {
           </p>
         </div>
 
-        <form className="w-full space-y-6">
+        <form className="w-full space-y-6" onSubmit={handleSubmit}>
           <label className="flex flex-col">
             <p className="text-foreground text-base font-medium leading-normal pb-2">
               Full Name
@@ -49,6 +53,7 @@ export default function KycModal({ closeModal }) {
               onChange={handleChange}
               className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-ring border border-input bg-background h-14 placeholder:text-muted-foreground p-[15px] text-base font-normal leading-normal"
               placeholder="Enter your full name"
+              required
             />
           </label>
 
@@ -64,6 +69,7 @@ export default function KycModal({ closeModal }) {
                 className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-ring border border-input bg-background h-14 placeholder:text-muted-foreground p-[15px] text-base font-normal leading-normal"
                 placeholder="+1 (555) 000-0000"
                 type="tel"
+                required
               />
             </label>
 
@@ -78,6 +84,7 @@ export default function KycModal({ closeModal }) {
                 className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-ring border border-input bg-background h-14 placeholder:text-muted-foreground p-[15px] text-base font-normal leading-normal"
                 placeholder="you@example.com"
                 type="email"
+                required
               />
             </label>
           </div>
@@ -88,6 +95,7 @@ export default function KycModal({ closeModal }) {
                 Government ID Type
               </p>
               <select
+                required
                 name="idType"
                 value={userData.idType}
                 onChange={handleChange}
@@ -106,6 +114,7 @@ export default function KycModal({ closeModal }) {
                 Government ID Number
               </p>
               <input
+                required
                 name="idNumber"
                 value={userData.idNumber}
                 onChange={handleChange}
@@ -116,8 +125,7 @@ export default function KycModal({ closeModal }) {
           </div>
 
           <button
-            type="button"
-            onClick={handleSubmit}
+            type="submit"
             className="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 px-4 bg-primary text-primary-foreground text-base font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
             <span className="truncate">Submit for Verification</span>
@@ -125,10 +133,7 @@ export default function KycModal({ closeModal }) {
 
           <p className="text-center text-xs text-muted-foreground/60">
             Your data is encrypted and stored securely. Read our{" "}
-            <a
-              className="font-medium text-primary hover:underline"
-              href="#"
-            >
+            <a className="font-medium text-primary hover:underline" href="#">
               Privacy Policy
             </a>
             .
