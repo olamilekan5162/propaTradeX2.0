@@ -27,7 +27,8 @@ export const uploadImageVideoFile = async (
   e,
   imageFile,
   videoFile,
-  documentFile = ""
+  documentFile = "",
+  toastId
 ) => {
   e.preventDefault();
   let documentCid = null;
@@ -44,10 +45,8 @@ export const uploadImageVideoFile = async (
     }
 
     console.log("files uploaded successfully");
-    toast.success("files uploaded successfully, creating transaction", {
-      duration: 5000,
-    });
-
+    toast.success("files uploaded successfully, creating transaction", { id: toastId });
+    
     return {
       imageCid: imageCid,
       videoCid: videoCid,
@@ -55,8 +54,6 @@ export const uploadImageVideoFile = async (
     };
   } catch (e) {
     console.error(e);
-    toast.error("failed to upload files", {
-      duration: 5000,
-    });
+    toast.success("failed to upload files, please try again", { id: toastId });
   }
 };

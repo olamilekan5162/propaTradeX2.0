@@ -35,6 +35,7 @@ const Dashboard = () => {
     }
   );
 
+
   const { data: receipts, isPending: isReceiptPending } = useIotaClientQuery(
     "getOwnedObjects",
     {

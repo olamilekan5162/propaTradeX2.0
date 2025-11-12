@@ -1,8 +1,87 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DisputeList from "../components/DisputeList";
+import { useIotaClientQuery, useIotaClient } from "@iota/dapp-kit";
+import { useNetworkVariables } from "../config/networkConfig";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Admin() {
   const [activeTab, setActiveTab] = useState("disputes");
+    const { propatradexPackageId } = useNetworkVariables("propatradexPackageId");
+    const iotaClient = useIotaClient()
+
+    const { data: disputeData, isPending: isDisputePending } = useIotaClientQuery(
+      "queryEvents",
+      {
+        query: {
+          MoveEventType: `${propatradexPackageId}::propatradex::DisputeRaised`,
+        },
+      },
+      {
+        select: (data) =>
+          data.data
+            .flatMap((x) => x.parsedJson)    
+      }
+    );
+
+    const { data: enrichedDisputes, isPending: isEnrichingPending } = useQuery({
+      queryKey: ['enrichedDisputes', disputeData],
+      queryFn: async () => {
+        if (!disputeData || disputeData.length === 0) return [];
+  
+        const enrichedData = await Promise.all(
+          disputeData.map(async (dispute) => {
+            try {
+              // Fetch the escrow object
+              const escrowObj = await iotaClient.getObject({
+                id: dispute.escrow_id,
+                options: { showContent: true },
+              });
+  
+              const escrowFields = escrowObj.data?.content?.fields;
+              
+              // Fetch the property object
+              const propertyObj = await iotaClient.getObject({
+                id: escrowFields.property_id,
+                options: { showContent: true },
+              });
+  
+              const propertyFields = propertyObj.data?.content?.fields;
+
+              return {
+                ...dispute,
+                escrow_id: dispute.escrow_id,
+                property_id: escrowFields.property_id,
+                buyer_renter: escrowFields.buyer_renter,
+                seller_landlord: escrowFields.seller_landlord,
+                amount: escrowFields.amount,
+                listing_type: escrowFields.listing_type,
+                buyer_receipt_id: escrowFields.buyer_renter_receipt_id,
+                seller_receipt_id: escrowFields.seller_landlord_receipt_id,
+                property_address: propertyFields.property_address,
+                resolved: escrowFields.resolved,
+              };
+
+            } catch (error) {
+              console.error('Error enriching dispute:', error);
+              return null;
+            }
+          })
+        );
+  
+        return enrichedData.filter(d => d !== null && !d.resolved);
+      },
+      enabled: !!disputeData && disputeData.length > 0,
+    });
+  
+    const isPending = isDisputePending || isEnrichingPending;
+
+    useEffect(() => {
+      if(!isPending){
+        console.log("enrichedDisputes", enrichedDisputes)
+      }
+
+    },[isPending, enrichedDisputes])
+  
 
   return (
     <div className="min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)] px-6 py-10">

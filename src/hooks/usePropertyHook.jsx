@@ -52,10 +52,12 @@ export const usePropertyhook = () => {
             });
             if (effects?.status?.status === "success") {
               toast.success("Registration successfully", { id: toastId });
+              console.log("successfull")
             } else {
               toast.error("Registration failed, try again", {
                 id: toastId,
               });
+              console.log("successfull")
             }
             window.location.reload();
           },
@@ -265,8 +267,6 @@ export const usePropertyhook = () => {
           tx.object(propatradexAdminCap),
           tx.object(escrow.escrow_id),
           tx.object(escrow.property_id),
-          tx.object(escrow.receiptId),
-          tx.object(escrow.receiptId),
           tx.object("0x6"),
         ],
         target: `${propatradexPackageId}::propatradex::admin_resolve_dispute_release`,
@@ -313,8 +313,6 @@ export const usePropertyhook = () => {
           tx.object(propatradexAdminCap),
           tx.object(escrow.escrow_id),
           tx.object(escrow.property_id),
-          tx.object(escrow.receiptId),
-          tx.object(escrow.receiptId),
           tx.object("0x6"),
         ],
         target: `${propatradexPackageId}::propatradex::admin_resolve_dispute_refund`,
@@ -357,6 +355,8 @@ export const usePropertyhook = () => {
     buyOrRentProperty,
     buyerOrRenterConfirm,
     sellerOrLandlordConfirm,
-    raiseDispute
+    raiseDispute,
+    adminRefundFund,
+    adminReleaseFund
   };
 };

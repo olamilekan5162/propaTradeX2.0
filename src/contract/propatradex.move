@@ -272,7 +272,6 @@ module propatradex::propatradex {
             user_address,
             full_name: profile.full_name,
             government_id_type: profile.government_id_type,
-            government_id_number: profile.government_id_number,
             phone_number: profile.phone_number,
             email: profile.email,
             timestamp: profile.created_at,
@@ -291,9 +290,9 @@ module propatradex::propatradex {
         description: vector<u8>,
         images_cids: vector<vector<u8>>,
         video_cid: vector<u8>,
-        // Optional fields for rent
-        documents_cid: Option<vector<u8>>,
         // Optional fields for sale
+        documents_cid: Option<vector<u8>>,
+        // Optional fields for rent
         monthly_rent: Option<u64>,
         rental_period_months: Option<u64>,
         deposit_required: Option<u64>,
@@ -603,8 +602,6 @@ module propatradex::propatradex {
         _admin_cap: &AdminCap,
         escrow: &mut Escrow,
         property: &mut PropertyListing,
-        buyer_receipt: &mut PropertyReceipt,
-        seller_receipt: &mut PropertyReceipt,
         clock: &Clock,
         ctx: &mut TxContext
     ) {
@@ -622,16 +619,8 @@ module propatradex::propatradex {
             let rental_period = *option::borrow(&property.rental_period_months);
             let rental_duration = rental_period * seconds_in_month;
             
-            let start_date = option::some(current_time);
-            let end_date = option::some(current_time + rental_duration);
-            
-            buyer_receipt.rental_start_date = start_date;
-            buyer_receipt.rental_end_date = end_date;
-            seller_receipt.rental_start_date = start_date;
-            seller_receipt.rental_end_date = end_date;
-            
-            property.rental_start_date = start_date;
-            property.rental_end_date = end_date;
+            property.rental_start_date = option::some(current_time);
+            property.rental_end_date = option::some(current_time + rental_duration);
             property.status = STATUS_RENTED;
         } else {
             property.status = STATUS_COMPLETED;
@@ -655,8 +644,6 @@ module propatradex::propatradex {
         _admin_cap: &AdminCap,
         escrow: &mut Escrow,
         property: &mut PropertyListing,
-        buyer_receipt: PropertyReceipt,
-        seller_receipt: PropertyReceipt,
         clock: &Clock,
         ctx: &mut TxContext
     ) {
@@ -666,43 +653,6 @@ module propatradex::propatradex {
         let amount = balance::value(&escrow.funds);
         let refund = coin::from_balance(balance::split(&mut escrow.funds, amount), ctx);
         transfer::public_transfer(refund, escrow.buyer_renter);
-
-        // Delete receipts
-        let PropertyReceipt { 
-            id: buyer_receipt_id, 
-            listing_type: _, 
-            timestamp: _,
-            property_id: _,
-            property_address: _,
-            property_type: _,
-            buyer_renter_address: _,
-            seller_landlord_address: _,
-            amount_paid: _,
-            rental_start_date: _,
-            rental_end_date: _,
-            rental_period_months: _,
-            monthly_rent: _,
-            metadata_uri: _,
-        } = buyer_receipt;
-        object::delete(buyer_receipt_id);
-
-        let PropertyReceipt { 
-            id: seller_receipt_id, 
-            listing_type: _, 
-            timestamp: _,
-            property_id: _,
-            property_address: _,
-            property_type: _,
-            buyer_renter_address: _,
-            seller_landlord_address: _,
-            amount_paid: _,
-            rental_start_date: _,
-            rental_end_date: _,
-            rental_period_months: _,
-            monthly_rent: _,
-            metadata_uri: _,
-        } = seller_receipt;
-        object::delete(seller_receipt_id);
 
         property.status = STATUS_AVAILABLE;
         property.locked_by = option::none();
@@ -714,7 +664,7 @@ module propatradex::propatradex {
             escrow_id: object::id(escrow),
             winner: escrow.buyer_renter,
             amount,
-            receipts_deleted: true,
+            receipts_deleted: false,
             timestamp: clock::timestamp_ms(clock),
         });
     }
@@ -774,6 +724,10 @@ module propatradex::propatradex {
 
     public fun has_profile(registry: &ProfileRegistry, user_address: address): bool {
         table::contains(&registry.profiles, user_address)
+    }
+
+    public fun get_receipt_ids(escrow: &Escrow): (Option<ID>, Option<ID>) {
+        (escrow.buyer_renter_receipt_id, escrow.seller_landlord_receipt_id)
     }
 
     public fun get_property_status(property: &PropertyListing): u8 {

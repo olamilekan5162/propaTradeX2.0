@@ -24,7 +24,7 @@ export const usePropertyUpload = () => {
   const { mutate: signAndExecute } = useSignAndExecuteTransaction();
   const currentAccount = useCurrentAccount();
 
-  const uploadProperty = async (listingType, formData, cids) => {
+  const uploadProperty = async (listingType, formData, cids, toastId) => {
     if (!formData || !cids) {
       toast.error("Form data are missing");
       return;
@@ -74,7 +74,6 @@ export const usePropertyUpload = () => {
         target: `${propatradexPackageId}::propatradex::list_property`,
       });
 
-      const toastId = toast.loading("Processing...");
 
       signAndExecute(
         { transaction: tx },
@@ -102,7 +101,9 @@ export const usePropertyUpload = () => {
         }
       );
     } catch (error) {
-      toast.error("An unexpected error occurred", error.message);
+      toast.error("An unexpected error occurred", error.message, {
+        id: toastId,
+      });
       console.log("An unexpected error occurred", error);
     }
   };

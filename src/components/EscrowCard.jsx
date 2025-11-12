@@ -1,15 +1,14 @@
 import { usePropertyhook } from "../hooks/usePropertyHook";
 import { ShieldCheck, User, Home, DollarSign, AlertTriangle, X, FileText, Send } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const EscrowCard = ({ escrow }) => {
-  const { buyerOrRenterConfirm, sellerOrLandlordConfirm } = usePropertyhook();
+  const { buyerOrRenterConfirm, sellerOrLandlordConfirm, raiseDispute } = usePropertyhook();
   const [showDisputeModal, setShowDisputeModal] = useState(false);
   const [disputeReason, setDisputeReason] = useState("");
-  const [disputeCategory, setDisputeCategory] = useState("");
-  const [disputeDescription, setDisputeDescription] = useState("");
-  
+
+   
   const {
     property_type,
     property_address,
@@ -22,29 +21,12 @@ const EscrowCard = ({ escrow }) => {
   } = escrow;
 
   const handleBuyerConfirm = async (escrow) => {
-    try {
-      toast.loading("Processing confirmation...");
+  
       await buyerOrRenterConfirm(escrow);
-      toast.dismiss();
-      toast.success("Confirmed successfully!");
-    } catch (error) {
-      toast.dismiss();
-      toast.error("Confirmation failed. Please try again.");
-      console.error(error);
-    }
   };
 
   const handleSellerConfirm = async (escrow) => {
-    try {
-      toast.loading("Processing confirmation...");
-      await sellerOrLandlordConfirm(escrow);
-      toast.dismiss();
-      toast.success("Confirmed successfully!");
-    } catch (error) {
-      toast.dismiss();
-      toast.error("Confirmation failed. Please try again.");
-      console.error(error);
-    }
+    await sellerOrLandlordConfirm(escrow);
   };
 
   const handleOpenDispute = () => {
@@ -54,34 +36,20 @@ const EscrowCard = ({ escrow }) => {
   const handleCloseDispute = () => {
     setShowDisputeModal(false);
     setDisputeReason("");
-    setDisputeCategory("");
-    setDisputeDescription("");
+  
   };
-
+  
   const handleSubmitDispute = async (e) => {
     e.preventDefault();
-    
-    if (!disputeCategory || !disputeReason || !disputeDescription) {
-      toast.error("Please fill in all fields");
+    if (!disputeReason) {
+      toast.error("Please fill in dispute reason");
       return;
     }
+    await raiseDispute(escrow.escrow_id, disputeReason)
 
-    try {
-      toast.loading("Submitting dispute...");
-      
-      // Add your dispute submission logic here
-      // await submitDispute({ escrow, disputeCategory, disputeReason, disputeDescription });
-      
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulated delay
-      
-      toast.dismiss();
-      toast.success("Dispute submitted successfully! Our team will review it shortly.");
-      handleCloseDispute();
-    } catch (error) {
-      toast.dismiss();
-      toast.error("Failed to submit dispute. Please try again.");
-      console.error(error);
-    }
+    setDisputeReason("");
+    setShowDisputeModal(false);
+
   };
 
   const transactionType = listing_type === 1 ? "Sale" : "Rent";
@@ -234,7 +202,7 @@ const EscrowCard = ({ escrow }) => {
             {/* Form */}
             <form onSubmit={handleSubmitDispute} className="p-6 space-y-6">
               {/* Dispute Category */}
-              <div>
+              {/* <div>
                 <label className="block font-semibold mb-2 flex items-center gap-2">
                   <FileText size={16} className="text-primary" />
                   Dispute Category *
@@ -252,14 +220,23 @@ const EscrowCard = ({ escrow }) => {
                     </option>
                   ))}
                 </select>
-              </div>
+              </div> */}
 
               {/* Brief Reason */}
               <div>
                 <label className="block font-semibold mb-2">
                   Brief Reason *
                 </label>
-                <input
+                <textarea
+                  value={disputeReason}
+                  onChange={(e) => setDisputeReason(e.target.value)}
+                  placeholder="Please provide a detailed explanation of the issue. Include any relevant dates, communications, or evidence that supports your dispute."
+                  required
+                  rows={6}
+                  className="w-full border border-border rounded-lg p-3 bg-background focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none"
+                />
+                <p className="text-xs text-muted-foreground mt-1">{disputeReason.length} characters</p>
+                {/* <input
                   type="text"
                   value={disputeReason}
                   onChange={(e) => setDisputeReason(e.target.value)}
@@ -268,7 +245,7 @@ const EscrowCard = ({ escrow }) => {
                   maxLength={100}
                   className="w-full border border-border rounded-lg p-3 bg-background focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
                 />
-                <p className="text-xs text-muted-foreground mt-1">{disputeReason.length}/100 characters</p>
+                <p className="text-xs text-muted-foreground mt-1">{disputeReason.length}/100 characters</p> */}
               </div>
 
               {/* Detailed Description */}
@@ -276,15 +253,7 @@ const EscrowCard = ({ escrow }) => {
                 <label className="block font-semibold mb-2">
                   Detailed Description *
                 </label>
-                <textarea
-                  value={disputeDescription}
-                  onChange={(e) => setDisputeDescription(e.target.value)}
-                  placeholder="Please provide a detailed explanation of the issue. Include any relevant dates, communications, or evidence that supports your dispute."
-                  required
-                  rows={6}
-                  className="w-full border border-border rounded-lg p-3 bg-background focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none"
-                />
-                <p className="text-xs text-muted-foreground mt-1">{disputeDescription.length} characters</p>
+               
               </div>
 
               {/* Warning Notice */}

@@ -4,6 +4,7 @@ import Jazzicon from "react-jazzicon";
 import { NavLink, useOutletContext } from "react-router-dom";
 
 const Navbar = ({registeredUserData}) => {
+  const currentAccount = useCurrentAccount()
  
   return (
     <header className="w-full bg-background  border-b border-solid border-border  px-4 md:px-10 lg:px-40">
@@ -37,9 +38,9 @@ const Navbar = ({registeredUserData}) => {
         <div className="hidden md:flex flex-1 justify-center gap-8">
           <NavLink
             className="text-muted-foreground text-sm font-medium leading-normal hover:text-primary "
-            to="home"
+            to="explore"
           >
-            Home
+            Explore
           </NavLink>
         
          {registeredUserData && registeredUserData.length > 0 &&
@@ -59,12 +60,16 @@ const Navbar = ({registeredUserData}) => {
           </NavLink>
           </> 
          }
+
+         {currentAccount?.address === "0xfff6cfb02d8b81e1ab2195ce4c7361274575c386bdfb638269a416db1b6aefb9" &&
+
          <NavLink
             className="text-muted-foreground text-sm font-medium leading-normal hover:text-primary "
             to="admin"
           >
             Admin
           </NavLink>
+         }
 
         </div>
         <div className="flex items-center gap-4">

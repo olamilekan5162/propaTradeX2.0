@@ -19,7 +19,7 @@ const LandingPage = () => {
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-4">
             <Link 
-              to="/dashboard" 
+              to="/explore" 
               className="bg-primary text-primary-foreground font-bold py-3 px-8 rounded-lg hover:bg-primary/80 transition-all duration-300 transform hover:scale-105 shadow-[0_0_20px_var(--color-primary)] flex items-center justify-center gap-2"
             >
               Explore Properties <ArrowRight size={20} />
@@ -75,7 +75,7 @@ const LandingPage = () => {
           <h2 className="text-3xl font-bold">Begin Your Journey</h2>
           <p className="mt-2 text-muted-foreground">The perfect property is waiting for you. Connect your wallet and start exploring.</p>
           <div className="mt-8">
-            <Link to="/dashboard" className="bg-primary text-primary-foreground font-bold py-3 px-8 rounded-lg hover:bg-primary/80 transition duration-300 transform hover:scale-105 shadow-[0_0_20px_var(--color-primary)]">
+            <Link to="/explore" className="bg-primary text-primary-foreground font-bold py-3 px-8 rounded-lg hover:bg-primary/80 transition duration-300 transform hover:scale-105 shadow-[0_0_20px_var(--color-primary)]">
               Explore Listings
             </Link>
           </div>

@@ -6,6 +6,7 @@ import { usePropertyUpload } from "../hooks/usePropertyUpload";
 
 const UploadPage = () => {
   const { uploadProperty } = usePropertyUpload();
+  const [loading, setLoading] = useState(false)
   const [listingType, setListingType] = useState("");
   const [formData, setFormData] = useState({
     propertyAddress: "",
@@ -52,15 +53,21 @@ const UploadPage = () => {
       return;
     }
 
+    const toastId = toast.loading("Processing")
+
   
       const cids = await uploadImageVideoFile(
         e,
         formData.images[0],
         formData.video,
-        formData.document
+        formData.document,
+        toastId
       );
 
-      await uploadProperty(listingType, formData, cids);
+      await uploadProperty(listingType, formData, cids, toastId);
+
+      toast.dismiss(toastId);
+      toast.success("Property uploaded successfully!");
       
       // Reset form
       setFormData({
