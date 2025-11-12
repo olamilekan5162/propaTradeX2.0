@@ -8,9 +8,9 @@ import { useFetchProperty } from "../hooks/useFetchProperty";
 import { Filter, X } from "lucide-react";
 
 const Home = () => {
-  const { registeredUserData } = useOutletContext();
+  const registeredUserData  = useOutletContext();
   const { propertyDetails, isPending } = useFetchProperty();
-  const [isKycModalOpen, setIsKycModalOpen] = useState(true);
+  const [isKycModalOpen, setIsKycModalOpen] = useState(false);
   const currentAccount = useCurrentAccount();
   
   // Filter states
@@ -20,9 +20,11 @@ const Home = () => {
   const [activeSearch, setActiveSearch] = useState("");
 
   useEffect(() => {
-    if (currentAccount && registeredUserData && registeredUserData.length === 0) {
-      setIsKycModalOpen(false);
+    if (currentAccount && registeredUserData.length === 0) {
+      setIsKycModalOpen(true);
     }
+   
+    
   }, [currentAccount, registeredUserData]);
 
   const closeModal = () => {
