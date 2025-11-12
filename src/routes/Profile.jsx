@@ -1,4 +1,4 @@
-import { useCurrentAccount } from "@iota/dapp-kit";
+import { useCurrentAccount, useDisconnectWallet } from "@iota/dapp-kit";
 import { Copy, ArrowRight, LogOut } from "lucide-react";
 import { trimAddress } from "../utils/helper";
 import toast from "react-hot-toast";
@@ -10,6 +10,8 @@ import NotRegisteredState from "../components/States/NotRegisteredState";
 const Profile = () => {
   const currentAccount = useCurrentAccount();
   const registeredUserData = useOutletContext();
+
+  const {mutateAsync: disconnectWallet} = useDisconnectWallet()
 
   const handleCopy = () => {
     if (currentAccount?.address) {
@@ -69,7 +71,7 @@ const Profile = () => {
                 </div>
             </div>
             <button 
-              onClick={handleDisconnect}
+              onClick={disconnectWallet}
               className="flex items-center gap-2 bg-accent text-accent-foreground font-bold py-2.5 px-6 rounded-lg hover:bg-accent/80 transition-all duration-300 transform hover:scale-105 shadow-[0_0_15px_var(--color-accent)]"
             >
               <LogOut size={18} />

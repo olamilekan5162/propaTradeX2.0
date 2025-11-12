@@ -4,6 +4,8 @@ import { NavLink, useOutletContext } from "react-router-dom";
 
 const Navbar = () => {
 
+
+
   const registeredUserData = useOutletContext()
   const [isUser, setIsuser] = useState(false)
    useEffect(() => {
