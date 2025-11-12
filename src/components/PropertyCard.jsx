@@ -3,7 +3,7 @@ import { MapPin, Tag } from "lucide-react";
 
 const PropertyCard = ({ property }) => {
   const navigate = useNavigate();
-  
+
   return (
     <div className="flex flex-col bg-card border border-border rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:border-primary/50 hover:-translate-y-1 hover:shadow-[0_0_15px_var(--color-primary)]">
       {/* Image */}

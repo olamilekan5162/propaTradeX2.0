@@ -169,7 +169,7 @@ const Dashboard = () => {
         <div className="container mx-auto py-8 px-4 max-w-5xl">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl lg:text-4xl font-bold tracking-tight bg-gradient-to-r from-foreground to-muted-foreground text-transparent bg-clip-text">
+              <h1 className="text-3xl lg:text-4xl font-bold tracking-tight bg-linear-to-r from-foreground to-muted-foreground text-transparent bg-clip-text">
                 Welcome Back,{" "}
                 {formatFirstName(registeredUserData[0]?.full_name)}!
               </h1>

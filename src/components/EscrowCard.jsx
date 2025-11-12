@@ -1,14 +1,23 @@
 import { usePropertyhook } from "../hooks/usePropertyHook";
-import { ShieldCheck, User, Home, DollarSign, AlertTriangle, X, FileText, Send } from "lucide-react";
+import {
+  ShieldCheck,
+  User,
+  Home,
+  DollarSign,
+  AlertTriangle,
+  X,
+  FileText,
+  Send,
+} from "lucide-react";
 import { toast } from "react-hot-toast";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const EscrowCard = ({ escrow }) => {
-  const { buyerOrRenterConfirm, sellerOrLandlordConfirm, raiseDispute } = usePropertyhook();
+  const { buyerOrRenterConfirm, sellerOrLandlordConfirm, raiseDispute } =
+    usePropertyhook();
   const [showDisputeModal, setShowDisputeModal] = useState(false);
   const [disputeReason, setDisputeReason] = useState("");
 
-   
   const {
     property_type,
     property_address,
@@ -21,8 +30,7 @@ const EscrowCard = ({ escrow }) => {
   } = escrow;
 
   const handleBuyerConfirm = async (escrow) => {
-  
-      await buyerOrRenterConfirm(escrow);
+    await buyerOrRenterConfirm(escrow);
   };
 
   const handleSellerConfirm = async (escrow) => {
@@ -36,33 +44,22 @@ const EscrowCard = ({ escrow }) => {
   const handleCloseDispute = () => {
     setShowDisputeModal(false);
     setDisputeReason("");
-  
   };
-  
+
   const handleSubmitDispute = async (e) => {
     e.preventDefault();
     if (!disputeReason) {
       toast.error("Please fill in dispute reason");
       return;
     }
-    await raiseDispute(escrow.escrow_id, disputeReason)
+    await raiseDispute(escrow.escrow_id, disputeReason);
 
     setDisputeReason("");
     setShowDisputeModal(false);
-
   };
 
   const transactionType = listing_type === 1 ? "Sale" : "Rent";
   const formattedAmount = (Number(amount) / 1_000_000_000).toLocaleString();
-
-  const disputeCategories = [
-    "Property Condition Mismatch",
-    "Payment Issues",
-    "Documentation Problems",
-    "Misrepresentation",
-    "Contract Violation",
-    "Other"
-  ];
 
   return (
     <>
@@ -92,7 +89,9 @@ const EscrowCard = ({ escrow }) => {
               <div className="flex items-start gap-2">
                 <User size={16} className="text-muted-foreground mt-0.5" />
                 <div>
-                  <p className="text-xs text-muted-foreground mb-0.5">Buyer/Renter</p>
+                  <p className="text-xs text-muted-foreground mb-0.5">
+                    Buyer/Renter
+                  </p>
                   <p className="text-sm font-mono font-medium text-foreground">
                     {buyer_renter.slice(0, 10)}...
                   </p>
@@ -101,7 +100,9 @@ const EscrowCard = ({ escrow }) => {
               <div className="flex items-start gap-2">
                 <User size={16} className="text-muted-foreground mt-0.5" />
                 <div>
-                  <p className="text-xs text-muted-foreground mb-0.5">Seller/Landlord</p>
+                  <p className="text-xs text-muted-foreground mb-0.5">
+                    Seller/Landlord
+                  </p>
                   <p className="text-sm font-mono font-medium text-foreground">
                     {seller_landlord.slice(0, 10)}...
                   </p>
@@ -111,15 +112,18 @@ const EscrowCard = ({ escrow }) => {
           </div>
 
           {/* Right Section - Amount & Actions */}
-          <div className="flex flex-col items-end gap-4 lg:min-w-[240px]">
+          <div className="flex flex-col items-end gap-4 lg:min-w-60">
             {/* Amount */}
             <div className="text-right">
               <div className="flex items-center gap-2 justify-end mb-1">
                 <DollarSign size={20} className="text-primary" />
-                <p className="text-xs text-muted-foreground uppercase tracking-wide">Escrow Amount</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">
+                  Escrow Amount
+                </p>
               </div>
               <p className="text-3xl font-bold text-foreground">
-                {formattedAmount} <span className="text-base text-muted-foreground">IOTA</span>
+                {formattedAmount}{" "}
+                <span className="text-base text-muted-foreground">IOTA</span>
               </p>
             </div>
 
@@ -176,7 +180,9 @@ const EscrowCard = ({ escrow }) => {
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold">Raise a Dispute</h2>
-                  <p className="text-sm text-muted-foreground">File a formal complaint about this transaction</p>
+                  <p className="text-sm text-muted-foreground">
+                    File a formal complaint about this transaction
+                  </p>
                 </div>
               </div>
               <button
@@ -192,9 +198,15 @@ const EscrowCard = ({ escrow }) => {
               <div className="flex items-start gap-4">
                 <Home className="text-primary mt-1" size={20} />
                 <div>
-                  <p className="font-semibold text-foreground">{property_type}</p>
-                  <p className="text-sm text-muted-foreground">{property_address}</p>
-                  <p className="text-sm text-primary font-bold mt-1">{formattedAmount} IOTA</p>
+                  <p className="font-semibold text-foreground">
+                    {property_type}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {property_address}
+                  </p>
+                  <p className="text-sm text-primary font-bold mt-1">
+                    {formattedAmount} IOTA
+                  </p>
                 </div>
               </div>
             </div>
@@ -235,7 +247,9 @@ const EscrowCard = ({ escrow }) => {
                   rows={6}
                   className="w-full border border-border rounded-lg p-3 bg-background focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none"
                 />
-                <p className="text-xs text-muted-foreground mt-1">{disputeReason.length} characters</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {disputeReason.length} characters
+                </p>
                 {/* <input
                   type="text"
                   value={disputeReason}
@@ -253,17 +267,23 @@ const EscrowCard = ({ escrow }) => {
                 <label className="block font-semibold mb-2">
                   Detailed Description *
                 </label>
-               
               </div>
 
               {/* Warning Notice */}
               <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
                 <div className="flex gap-3">
-                  <AlertTriangle className="text-yellow-500 flex-shrink-0 mt-0.5" size={20} />
+                  <AlertTriangle
+                    className="text-yellow-500 shrink-0 mt-0.5"
+                    size={20}
+                  />
                   <div className="text-sm">
-                    <p className="font-semibold text-yellow-500 mb-1">Important Notice</p>
+                    <p className="font-semibold text-yellow-500 mb-1">
+                      Important Notice
+                    </p>
                     <p className="text-muted-foreground">
-                      Filing a false dispute may result in penalties. Please ensure all information provided is accurate and truthful. Our team will review your case within 48 hours.
+                      Filing a false dispute may result in penalties. Please
+                      ensure all information provided is accurate and truthful.
+                      Our team will review your case within 48 hours.
                     </p>
                   </div>
                 </div>

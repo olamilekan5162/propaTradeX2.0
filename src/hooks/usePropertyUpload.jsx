@@ -1,15 +1,10 @@
 import toast from "react-hot-toast";
 import { useNetworkVariables } from "../config/networkConfig";
 import { Transaction } from "@iota/iota-sdk/transactions";
-import {
-  useIotaClient,
-  useSignAndExecuteTransaction,
-} from "@iota/dapp-kit";
+import { useIotaClient, useSignAndExecuteTransaction } from "@iota/dapp-kit";
 
 export const usePropertyUpload = () => {
-  const {
-    propatradexPackageId,
-  } = useNetworkVariables(
+  const { propatradexPackageId } = useNetworkVariables(
     "propatradexPackageId",
     "propatradexAdminCap",
     "propatradexUpgradeCap",
@@ -24,6 +19,9 @@ export const usePropertyUpload = () => {
       toast.error("Form data are missing");
       return;
     }
+
+    console.log(formData);
+
     try {
       const tx = new Transaction();
 
@@ -62,13 +60,12 @@ export const usePropertyUpload = () => {
           ),
           tx.pure.option(
             "u64",
-            listingType === "rent" ? Number(formData.depositReqiured) : 0
+            listingType === "rent" ? Number(formData.depositRequired) : 0
           ),
           tx.object("0x6"),
         ],
         target: `${propatradexPackageId}::propatradex::list_property`,
       });
-
 
       signAndExecute(
         { transaction: tx },

@@ -1,4 +1,4 @@
-import { useIotaClientQuery } from "@iota/dapp-kit";
+import { useIotaClientQuery, useCurrentAccount } from "@iota/dapp-kit";
 import {
   Bath,
   BedDouble,
@@ -14,17 +14,23 @@ import {
   Heart,
   AlertCircle,
   X,
+  Receipt,
 } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import { usePropertyhook } from "../hooks/usePropertyHook";
 import { toast } from "react-hot-toast";
 import { useState } from "react";
+import { useNetworkVariables } from "../config/networkConfig";
+import ReceiptModal from "../components/ReceiptModal";
 
 const Listing = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const currentAccount = useCurrentAccount();
   const { buyOrRentProperty } = usePropertyhook();
   const [selectedImage, setSelectedImage] = useState(0);
+  const [showReceiptModal, setShowReceiptModal] = useState(false);
+  const { propatradexPackageId } = useNetworkVariables("propatradexPackageId");
 
   const {
     data: property,
@@ -34,6 +40,29 @@ const Listing = () => {
     "getObject",
     { id, options: { showContent: true, showOwner: true } },
     { select: (data) => data.data?.content?.fields }
+  );
+
+  // Fetch user's receipts to check if they own this property
+  const { data: userReceipts } = useIotaClientQuery(
+    "getOwnedObjects",
+    {
+      owner: currentAccount?.address || "",
+      filter: {
+        StructType: `${propatradexPackageId}::propatradex::PropertyReceipt`,
+      },
+      options: {
+        showContent: true,
+      },
+    },
+    {
+      enabled: !!currentAccount?.address,
+      select: (data) => data?.data?.map((x) => x?.data?.content?.fields) ?? [],
+    }
+  );
+
+  // Check if user has a receipt for this property
+  const propertyReceipt = userReceipts?.find(
+    (receipt) => receipt.property_id === id
   );
 
   const handleBuyorRent = async (property) => {
@@ -288,7 +317,18 @@ const Listing = () => {
               </div>
 
               {/* Action Button */}
-              <div>
+              <div className="space-y-3">
+                {/* View Receipt Button - Show if user has a receipt */}
+                {propertyReceipt && (
+                  <button
+                    onClick={() => setShowReceiptModal(true)}
+                    className="w-full py-3 bg-secondary/80 text-foreground border border-border font-semibold rounded-lg hover:bg-secondary transition-all duration-300 flex items-center justify-center gap-2"
+                  >
+                    <Receipt size={18} />
+                    View Receipt NFT
+                  </button>
+                )}
+
                 {isForSale ? (
                   <button
                     onClick={() => handleBuyorRent(property)}
@@ -301,7 +341,7 @@ const Listing = () => {
                   <button
                     onClick={() => handleBuyorRent(property)}
                     disabled={property?.status !== 1}
-                    className="w-full py-4 bg-accent text-accent-foreground font-bold rounded-lg hover:bg-accent/80 transition-all duration-300 transform hover:scale-105 shadow-[0_0_20px_var(--color-accent)]"
+                    className="w-full py-4 bg-accent text-accent-foreground font-bold rounded-lg hover:bg-accent/80 transition-all duration-300 transform hover:scale-105 shadow-[0_0_20px_var(--color-accent)] disabled:bg-gray-300 disabled:shadow-none"
                   >
                     Rent Property
                   </button>
@@ -374,6 +414,14 @@ const Listing = () => {
           </div>
         </div>
       </div>
+
+      {/* Receipt Modal */}
+      {showReceiptModal && propertyReceipt && (
+        <ReceiptModal
+          receipt={propertyReceipt}
+          onClose={() => setShowReceiptModal(false)}
+        />
+      )}
     </div>
   );
 };
