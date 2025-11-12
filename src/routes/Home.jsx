@@ -23,7 +23,6 @@ const Home = () => {
     if (currentAccount && registeredUserData.length === 0) {
       setIsKycModalOpen(true);
     }
-   
     
   }, [currentAccount, registeredUserData]);
 
