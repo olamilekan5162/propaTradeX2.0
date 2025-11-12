@@ -1,5 +1,4 @@
-
-import { Search, Building, KeyRound, Briefcase } from "lucide-react";
+import { Search, Building, KeyRound, Briefcase, TrendingUp, Filter, X } from "lucide-react";
 import { useState, useMemo } from "react";
 import { useNetworkVariables } from "../config/networkConfig";
 import { useCurrentAccount, useIotaClientQuery } from "@iota/dapp-kit";
@@ -14,7 +13,7 @@ const Dashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const currentAccount = useCurrentAccount();
   const { propatradexPackageId } = useNetworkVariables("propatradexPackageId");
-  const registeredUserData = useOutletContext()
+  const registeredUserData = useOutletContext();
   const { propertyDetails: properties, isPending: isPropertiesPending } = useFetchProperty();
 
   const { data: escrowData, isPending: isEscrowPending } = useIotaClientQuery(
@@ -91,125 +90,248 @@ const Dashboard = () => {
     if (!searchTerm) return ownedProperties;
     return ownedProperties.filter(p => 
       p.property_address.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.property_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.price.toString().includes(searchTerm)
     );
   }, [ownedProperties, searchTerm]);
 
   const filteredEscrows = useMemo(() => {
     if (!searchTerm) return enrichedEscrows;
-    // This is a simplified search. A real implementation would search property details.
     return enrichedEscrows.filter(e =>
+      e.property_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      e.property_address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       e.property_id.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [enrichedEscrows, searchTerm]);
 
-
   const isPending = isEscrowPending || isReceiptPending || isPropertiesPending;
 
   const stats = [
-    { name: "Total Properties Owned", value: ownedProperties.length, icon: Building },
-    { name: "Properties in Escrow", value: enrichedEscrows.length, icon: Briefcase },
-    { name: "Properties for Rent", value: ownedProperties.filter(p => p.listing_type === '2').length, icon: KeyRound },
+    { 
+      name: "Total Properties Owned", 
+      value: ownedProperties.length, 
+      icon: Building,
+      trend: "+2 this month",
+      color: "primary"
+    },
+    { 
+      name: "Properties in Escrow", 
+      value: enrichedEscrows.length, 
+      icon: Briefcase,
+      trend: `${enrichedEscrows.filter(e => e.isBuyer).length} as buyer`,
+      color: "accent"
+    },
+    { 
+      name: "Properties for Rent", 
+      value: ownedProperties.filter(p => p.listing_type === '2').length, 
+      icon: KeyRound,
+      trend: "Active listings",
+      color: "chart-2"
+    },
+  ];
+
+  const tabConfig = [
+    { id: 'owned', label: 'My Properties', count: filteredOwnedProperties.length },
+    { id: 'listed', label: 'Listed', count: 0 },
+    { id: 'escrow', label: 'In Escrow', count: filteredEscrows.length },
   ];
 
   return (
-    <div className="bg-background text-foreground min-h-screen font-sans">
-      <div className="container mx-auto py-10 px-4">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold tracking-tight">Welcome Back, {formatFirstName(registeredUserData[0]?.full_name)}!</h1>
-          <p className="text-muted-foreground mt-2">Here is an overview of your property portfolio.</p>
+    <div className="bg-background text-foreground min-h-screen">
+      {/* Header Section */}
+      <div className="border-b border-border bg-card/30 backdrop-blur">
+        <div className="container mx-auto py-8 px-4 max-w-5xl">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-3xl lg:text-4xl font-bold tracking-tight bg-gradient-to-r from-foreground to-muted-foreground text-transparent bg-clip-text">
+                Welcome Back, {formatFirstName(registeredUserData[0]?.full_name)}!
+              </h1>
+              <p className="text-muted-foreground mt-2">Manage your property portfolio and track transactions</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="px-4 py-2 bg-primary/10 text-primary rounded-lg border border-primary/20">
+                <p className="text-xs font-medium">Portfolio Value</p>
+                <p className="text-xl font-bold">
+                  {ownedProperties.reduce((sum, p) => sum + Number(p.price), 0).toLocaleString()} IOTA
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
 
+      <div className="container mx-auto py-8 px-4 max-w-5xl">
         {/* Stats Section */}
-        <div className="grid md:grid-cols-3 gap-6 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           {stats.map((stat, index) => (
-            <div key={index} className="bg-card border border-border rounded-xl p-6 flex items-center gap-6 transition-all duration-300 shadow-lg hover:border-primary/50 hover:-translate-y-1">
-              <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center">
-                <stat.icon className="h-8 w-8" />
+            <div 
+              key={index} 
+              className="bg-card border border-border rounded-xl p-6 transition-all duration-300 shadow-lg hover:border-primary/50 hover:shadow-[0_0_20px_var(--color-primary)] group"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div className={`w-14 h-14 bg-${stat.color}/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+                  <stat.icon className={`h-7 w-7 text-${stat.color}`} />
+                </div>
+                <TrendingUp className="text-green-500" size={20} />
               </div>
-              <div>
-                <p className="text-muted-foreground text-sm font-medium">{stat.name}</p>
-                <p className="text-2xl font-bold">{stat.value}</p>
-              </div>
+              <p className="text-3xl font-bold mb-1">{stat.value}</p>
+              <p className="text-muted-foreground text-sm font-medium mb-2">{stat.name}</p>
+              <p className="text-xs text-green-500 font-medium">{stat.trend}</p>
             </div>
           ))}
         </div>
 
-        {/* Tabs and Search */}
-        <div className="mb-8">
-            <div className="flex justify-between items-center mb-6 gap-4 flex-wrap">
-                <div className="flex border-b border-border gap-2 md:gap-8">
-                    {['owned', 'listed', 'escrow'].map((tab) => (
-                        <button
-                        key={tab}
-                        onClick={() => setActiveTab(tab)}
-                        className={`pb-3 pt-2 px-2 md:px-4 text-sm md:text-base font-bold transition-colors capitalize ${
- activeTab === tab
-                            ? "text-primary border-b-[3px] border-primary"
-                            : "text-muted-foreground border-b-[3px] border-transparent hover:text-foreground hover:border-border"
-                        }`}
-                        >
-                        {tab}
-                        </button>
-                    ))}
-                </div>
-                <div className="relative w-full md:w-auto flex-grow md:flex-grow-0">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={20}/>
-                    <input
-                        type="text"
-                        placeholder="Search properties..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full bg-card border border-border rounded-lg py-2.5 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-primary transition-shadow"
-                    />
-                </div>
+        {/* Tabs and Search Bar */}
+        <div className="bg-card border border-border rounded-xl p-6 shadow-lg mb-8">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            {/* Tabs */}
+            <div className="flex border border-border rounded-lg p-1 bg-background overflow-x-auto">
+              {tabConfig.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`relative px-6 py-2.5 rounded-md text-sm font-semibold whitespace-nowrap transition-all duration-300 ${
+                    activeTab === tab.id
+                      ? "bg-primary text-primary-foreground shadow-[0_0_15px_var(--color-primary)]"
+                      : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                  }`}
+                >
+                  {tab.label}
+                  {tab.count > 0 && (
+                    <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-bold ${
+                      activeTab === tab.id 
+                        ? "bg-primary-foreground/20 text-primary-foreground" 
+                        : "bg-primary/10 text-primary"
+                    }`}>
+                      {tab.count}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* Search Bar */}
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
+              <input
+                type="text"
+                placeholder={`Search ${activeTab} properties...`}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full bg-background border border-border rounded-lg py-3 pl-12 pr-12 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm("")}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <X size={18} />
+                </button>
+              )}
+            </div>
           </div>
+
+          {/* Search Results Info */}
+          {searchTerm && (
+            <div className="mt-4 pt-4 border-t border-border">
+              <p className="text-sm text-muted-foreground">
+                Found <span className="font-bold text-primary">
+                  {activeTab === 'owned' ? filteredOwnedProperties.length : 
+                   activeTab === 'escrow' ? filteredEscrows.length : 0}
+                </span> result{(activeTab === 'owned' ? filteredOwnedProperties.length : filteredEscrows.length) !== 1 ? 's' : ''} for "{searchTerm}"
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Tab Content */}
         <div>
           {isPending ? (
-            <div className="text-center py-10">
-              <p className="text-muted-foreground">Loading your properties...</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-card border border-border rounded-xl h-96 animate-pulse"></div>
+              ))}
             </div>
           ) : (
             <>
               {activeTab === "owned" && (
                 <div>
                   {filteredOwnedProperties.length > 0 ? (
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       {filteredOwnedProperties.map((prop, i) => (
                         <PropertyCard key={i} property={prop} />
                       ))}
                     </div>
                   ) : (
-                    <div className="text-center py-10 bg-card border border-border rounded-xl">
-                       <p className="text-muted-foreground">You don't own any properties yet.</p>
+                    <div className="text-center py-16">
+                      <div className="bg-card border border-border rounded-xl p-12">
+                        <Building className="mx-auto mb-4 text-muted-foreground" size={48} />
+                        <h3 className="text-xl font-bold mb-2">
+                          {searchTerm ? "No Properties Found" : "No Properties Yet"}
+                        </h3>
+                        <p className="text-muted-foreground mb-6">
+                          {searchTerm 
+                            ? "Try adjusting your search terms"
+                            : "Start building your portfolio by purchasing properties"}
+                        </p>
+                        {searchTerm && (
+                          <button
+                            onClick={() => setSearchTerm("")}
+                            className="px-6 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/80 transition-all"
+                          >
+                            Clear Search
+                          </button>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
               )}
 
               {activeTab === "listed" && (
-                <div className="text-center py-10 bg-card border border-border rounded-xl">
-                   <p className="text-muted-foreground">You have not listed any properties yet.</p>
+                <div className="text-center py-16">
+                  <div className="bg-card border border-border rounded-xl p-12">
+                    <KeyRound className="mx-auto mb-4 text-muted-foreground" size={48} />
+                    <h3 className="text-xl font-bold mb-2">No Listed Properties</h3>
+                    <p className="text-muted-foreground mb-6">
+                      List your properties to start earning rental income
+                    </p>
+                  </div>
                 </div>
               )}
 
               {activeTab === "escrow" && (
-                 <div>
-                    {filteredEscrows.length > 0 ? (
-                        <div className="flex flex-col gap-4">
-                        {filteredEscrows.map((escrow, i) => (
-                            <EscrowCard key={i} escrow={escrow} />
-                        ))}
-                        </div>
-                    ) : (
-                        <div className="text-center py-10 bg-card border border-border rounded-xl">
-                           <p className="text-muted-foreground">No escrow transactions found.</p>
-                        </div>
-                    )}
-                 </div>
+                <div>
+                  {filteredEscrows.length > 0 ? (
+                    <div className="flex flex-col gap-6">
+                      {filteredEscrows.map((escrow, i) => (
+                        <EscrowCard key={i} escrow={escrow} />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-16">
+                      <div className="bg-card border border-border rounded-xl p-12">
+                        <Briefcase className="mx-auto mb-4 text-muted-foreground" size={48} />
+                        <h3 className="text-xl font-bold mb-2">
+                          {searchTerm ? "No Escrow Transactions Found" : "No Active Escrow"}
+                        </h3>
+                        <p className="text-muted-foreground mb-6">
+                          {searchTerm
+                            ? "Try adjusting your search terms"
+                            : "Your escrow transactions will appear here"}
+                        </p>
+                        {searchTerm && (
+                          <button
+                            onClick={() => setSearchTerm("")}
+                            className="px-6 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/80 transition-all"
+                          >
+                            Clear Search
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
               )}
             </>
           )}
