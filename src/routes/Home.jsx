@@ -18,14 +18,12 @@ const Home = () => {
     if (currentAccount && registeredUserData.length === 0) {
       setIsKycModalOpen(true);
     }
-   
     
   }, [currentAccount, registeredUserData]);
 
   const closeModal = () => {
     setIsKycModalOpen(false);
   };
-
 
   return (
     <div className="bg-background font-display text-foreground">
