@@ -52,9 +52,7 @@ const UploadPage = () => {
       return;
     }
 
-    try {
-      toast.loading("Uploading property...");
-      
+  
       const cids = await uploadImageVideoFile(
         e,
         formData.images[0],
@@ -63,9 +61,6 @@ const UploadPage = () => {
       );
 
       await uploadProperty(listingType, formData, cids);
-      
-      toast.dismiss();
-      toast.success("Property listing submitted successfully!");
       
       // Reset form
       setFormData({
@@ -81,11 +76,7 @@ const UploadPage = () => {
         video: null,
       });
       setListingType("");
-    } catch (error) {
-      toast.dismiss();
-      toast.error("Failed to upload property. Please try again.");
-      console.error(error);
-    }
+   
   };
 
   const handleReset = () => {
