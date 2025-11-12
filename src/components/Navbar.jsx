@@ -59,7 +59,7 @@ const Navbar = ({ registeredUserData }) => {
             </>
           )}
 
-          {currentAccount?.address !==
+          {currentAccount?.address ===
             "0xfff6cfb02d8b81e1ab2195ce4c7361274575c386bdfb638269a416db1b6aefb9" && (
             <NavLink
               className="text-muted-foreground text-sm font-medium leading-normal hover:text-primary "
