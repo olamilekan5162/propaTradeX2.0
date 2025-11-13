@@ -112,7 +112,6 @@ export default function Admin() {
               Pending Verifications
             </button>
           </div>
-
           {/* Tabs Content */}
           <div className="mt-6">
             {activeTab === "disputes" && (
@@ -120,7 +119,7 @@ export default function Admin() {
                 <h2 className="text-2xl font-semibold mb-4 text-[var(--color-foreground)]">
                   Active Disputes
                 </h2>
-                {enrichedDisputes ? (
+                {enrichedDisputes.lenght > 0 ? (
                   <DisputeList disputes={enrichedDisputes} />
                 ) :(
                   <div className="text-center py-2">

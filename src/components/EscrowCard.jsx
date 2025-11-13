@@ -12,8 +12,10 @@ import {
 import { toast } from "react-hot-toast";
 import { useState, useEffect } from "react";
 import {
+  useCurrentAccount,
   useIotaClient,
 } from "@iota/dapp-kit";
+import { trimAddress } from "../utils/helper";
 
 const EscrowCard = ({ escrow }) => {
   const { buyerOrRenterConfirm, sellerOrLandlordConfirm, raiseDispute } =
@@ -22,6 +24,7 @@ const EscrowCard = ({ escrow }) => {
   const [escrowData, setEscrowData] = useState(null)
   const [loading, setLoading] = useState(false);
   const [disputeReason, setDisputeReason] = useState("");
+  const currentAccount = useCurrentAccount()
   const iotaClient = useIotaClient()
 
   useEffect(() => {
@@ -38,6 +41,7 @@ const EscrowCard = ({ escrow }) => {
           ...fields,
         };
         setEscrowData(merged);
+        console.log(merged)
      
       } catch (error) {
         console.error("Error fetching escrow object:", error);
@@ -64,6 +68,7 @@ const EscrowCard = ({ escrow }) => {
     seller_landlord_confirmed,
     resolved,
     dispute_raised,
+    dispute_raised_by,
     isBuyer,
     isSeller,
   } = escrowData;
@@ -166,54 +171,59 @@ const EscrowCard = ({ escrow }) => {
                 <span className="text-base text-muted-foreground">IOTA</span>
               </p>
             </div>
-
-            {/* Action Buttons */}
-            <div className="flex flex-col gap-2 w-full">
-              {
-                resolved ? ( 
+              {/* Action Buttons */}
+              <div className="flex flex-col gap-2 w-full">
+                {resolved ? (
+                
                   <p className="text-muted-foreground"><i>#Escrow Resolved</i></p>
+                ) : dispute_raised ? (
+                
+                  <p className="text-destructive font-semibold flex items-center gap-2">
+                    <AlertTriangle size={16} className="text-destructive" />
+                    <i>A dispute has been raised by {dispute_raised_by === currentAccount.address ? "you" : trimAddress(dispute_raised_by)}</i>
+                  </p>
                 ) : (
+                
                   <>
-                  {isBuyer && !buyer_renter_confirmed && (
-                    <>
-                      <button
-                        onClick={() => handleBuyerConfirm(escrow)}
-                        className="w-full py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/80 transition-all duration-300 transform hover:scale-105 shadow-[0_0_15px_var(--color-primary)]"
-                      >
-                        Confirm as Buyer
-                      </button>
-                      <button
-                        onClick={handleOpenDispute}
-                        className="w-full py-2 bg-destructive/10 text-destructive border border-destructive/30 font-semibold rounded-lg hover:bg-destructive/20 transition-all duration-300 flex items-center justify-center gap-2 text-sm"
-                      >
-                        <AlertTriangle size={16} />
-                        Raise Dispute
-                      </button>
-                    </>
-                  )}
-                  
-                  {isSeller && !seller_landlord_confirmed && (
-                    <>
-                      <button
-                        onClick={() => handleSellerConfirm(escrow)}
-                        className="w-full py-3 bg-accent text-accent-foreground font-bold rounded-lg hover:bg-accent/80 transition-all duration-300 transform hover:scale-105 shadow-[0_0_15px_var(--color-accent)]"
-                      >
-                        Confirm as Seller
-                      </button>
-                      <button
-                        onClick={handleOpenDispute}
-                        className="w-full py-2 bg-destructive/10 text-destructive border border-destructive/30 font-semibold rounded-lg hover:bg-destructive/20 transition-all duration-300 flex items-center justify-center gap-2 text-sm"
-                      >
-                        <AlertTriangle size={16} />
-                        Raise Dispute
-                      </button>
-                    </>
-                  )}
+                    {isBuyer && !buyer_renter_confirmed && (
+                      <>
+                        <button
+                          onClick={() => handleBuyerConfirm(escrow)}
+                          className="w-full py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/80 transition-all duration-300 transform hover:scale-105 shadow-[0_0_15px_var(--color-primary)]"
+                        >
+                          Confirm as Buyer
+                        </button>
+                        <button
+                          onClick={handleOpenDispute}
+                          className="w-full py-2 bg-destructive/10 text-destructive border border-destructive/30 font-semibold rounded-lg hover:bg-destructive/20 transition-all duration-300 flex items-center justify-center gap-2 text-sm"
+                        >
+                          <AlertTriangle size={16} />
+                          Raise Dispute
+                        </button>
+                      </>
+                    )}
+
+                    {isSeller && !seller_landlord_confirmed && (
+                      <>
+                        <button
+                          onClick={() => handleSellerConfirm(escrow)}
+                          className="w-full py-3 bg-accent text-accent-foreground font-bold rounded-lg hover:bg-accent/80 transition-all duration-300 transform hover:scale-105 shadow-[0_0_15px_var(--color-accent)]"
+                        >
+                          Confirm as Seller
+                        </button>
+                        <button
+                          onClick={handleOpenDispute}
+                          className="w-full py-2 bg-destructive/10 text-destructive border border-destructive/30 font-semibold rounded-lg hover:bg-destructive/20 transition-all duration-300 flex items-center justify-center gap-2 text-sm"
+                        >
+                          <AlertTriangle size={16} />
+                          Raise Dispute
+                        </button>
+                      </>
+                    )}
                   </>
-                )
-              }
-              
-            </div>
+                )}
+              </div>
+
           </div>
         </div>
       </div>
