@@ -97,11 +97,7 @@ const Dashboard = () => {
     // This checks if the connected user is the owner or is the locker
     const ownedPropertyIds = properties.filter(
       (property) =>
-        (property.owner === currentAccount?.address &&
-          (property.locked_by === currentAccount?.address ||
-            property?.locked_by === null)) ||
-        (property.listing_type === 1 &&
-          property.locked_by === currentAccount?.address)
+        (property.owner === currentAccount?.address)
     );
     return ownedPropertyIds;
   }, [properties, currentAccount?.address]);

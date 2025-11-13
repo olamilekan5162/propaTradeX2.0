@@ -8,7 +8,6 @@ import {
 } from "@iota/dapp-kit";
 import { useNetworkVariables } from "./config/networkConfig";
 import { Toaster } from "react-hot-toast";
-import { Transaction } from "@iota/iota-sdk/transactions";
 import UnconnectedState from "./components/States/UnconnectedState";
 
 function App() {
@@ -30,19 +29,13 @@ function App() {
           .filter((y) => y.user_address === currentAccount.address),
     }
   );
-
- 
-
  
 
   return (
     <>
       <Toaster position="top-center" />
       <Navbar registeredUserData={registeredUserData} />
-      {
-        currentAccount ? <Outlet context={registeredUserData || []} /> : <UnconnectedState />
-      }
-      
+      <Outlet context={registeredUserData || []} />
       <Footer />
     </>
   )

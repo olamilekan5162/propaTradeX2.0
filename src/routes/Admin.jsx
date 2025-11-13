@@ -3,6 +3,7 @@ import DisputeList from "../components/DisputeList";
 import { useIotaClientQuery, useIotaClient } from "@iota/dapp-kit";
 import { useNetworkVariables } from "../config/networkConfig";
 import { useQuery } from "@tanstack/react-query";
+import { AlertOctagon, Briefcase } from "lucide-react";
 
 export default function Admin() {
   const [activeTab, setActiveTab] = useState("disputes");
@@ -119,10 +120,28 @@ export default function Admin() {
                 <h2 className="text-2xl font-semibold mb-4 text-[var(--color-foreground)]">
                   Active Disputes
                 </h2>
-                <DisputeList disputes={enrichedDisputes} />
+                {enrichedDisputes ? (
+                  <DisputeList disputes={enrichedDisputes} />
+                ) :(
+                  <div className="text-center py-2">
+                    <div className="bg-card border border-border rounded-xl p-12">
+                      <AlertOctagon
+                        className="mx-auto mb-4 text-muted-foreground"
+                        size={48}
+                      />
+                      <h3 className="text-xl font-bold mb-2">
+                          No Dispute Found
+                      </h3>
+                      <p className="text-muted-foreground mb-6">
+                          Dispute details will appear here
+                      </p>
+                     
+                    </div>
+                  </div>
+                )
+                }
               </div>
             )}
-
             {activeTab === "kyc" && (
               <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-foreground)] shadow-lg">
                 <div className="p-6 border-b border-[var(--color-border)]">

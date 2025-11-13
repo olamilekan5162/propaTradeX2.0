@@ -526,6 +526,8 @@ module propatradex::propatradex {
             property.rental_end_date = option::some(current_time + rental_duration);
             property.status = STATUS_RENTED;
         } else {
+            // For SALE: Transfer ownership to buyer
+            property.owner = escrow.buyer_renter;
             property.status = STATUS_COMPLETED;
         };
 
@@ -623,6 +625,8 @@ module propatradex::propatradex {
             property.rental_end_date = option::some(current_time + rental_duration);
             property.status = STATUS_RENTED;
         } else {
+            // For SALE: Transfer ownership to buyer even in dispute resolution
+            property.owner = escrow.buyer_renter;
             property.status = STATUS_COMPLETED;
         };
 

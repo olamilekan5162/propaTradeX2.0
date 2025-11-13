@@ -10,24 +10,64 @@ import {
   Send,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import {
+  useIotaClient,
+} from "@iota/dapp-kit";
 
 const EscrowCard = ({ escrow }) => {
   const { buyerOrRenterConfirm, sellerOrLandlordConfirm, raiseDispute } =
     usePropertyhook();
   const [showDisputeModal, setShowDisputeModal] = useState(false);
+  const [escrowData, setEscrowData] = useState(null)
+  const [loading, setLoading] = useState(false);
   const [disputeReason, setDisputeReason] = useState("");
+  const iotaClient = useIotaClient()
 
+  useEffect(() => {
+    const getEscrowData = async () => {
+      setLoading(true)
+      try {
+        const response = await iotaClient.getObject({
+          id: escrow.escrow_id,
+          options: { showContent: true },
+        });
+        const fields = response?.data?.content?.fields;
+        const merged = {
+          ...escrow,
+          ...fields,
+        };
+        setEscrowData(merged);
+     
+      } catch (error) {
+        console.error("Error fetching escrow object:", error);
+      }finally{
+        setLoading(false)
+      }
+    };
+
+    getEscrowData();
+  }, [escrow.escrow_id]);
+
+  if (loading) return <p>Loading..</p>;
+  if (!escrowData) return null;
+
+  
   const {
-    property_type,
+    amount,
     property_address,
-    listing_type,
+    property_type,
     buyer_renter,
     seller_landlord,
-    amount,
+    listing_type,
+    buyer_renter_confirmed,
+    seller_landlord_confirmed,
+    resolved,
+    dispute_raised,
     isBuyer,
     isSeller,
-  } = escrow;
+  } = escrowData;
+
 
   const handleBuyerConfirm = async (escrow) => {
     await buyerOrRenterConfirm(escrow);
@@ -129,40 +169,50 @@ const EscrowCard = ({ escrow }) => {
 
             {/* Action Buttons */}
             <div className="flex flex-col gap-2 w-full">
-              {isBuyer && (
-                <>
-                  <button
-                    onClick={() => handleBuyerConfirm(escrow)}
-                    className="w-full py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/80 transition-all duration-300 transform hover:scale-105 shadow-[0_0_15px_var(--color-primary)]"
-                  >
-                    Confirm as Buyer
-                  </button>
-                  <button
-                    onClick={handleOpenDispute}
-                    className="w-full py-2 bg-destructive/10 text-destructive border border-destructive/30 font-semibold rounded-lg hover:bg-destructive/20 transition-all duration-300 flex items-center justify-center gap-2 text-sm"
-                  >
-                    <AlertTriangle size={16} />
-                    Raise Dispute
-                  </button>
-                </>
-              )}
-              {isSeller && (
-                <>
-                  <button
-                    onClick={() => handleSellerConfirm(escrow)}
-                    className="w-full py-3 bg-accent text-accent-foreground font-bold rounded-lg hover:bg-accent/80 transition-all duration-300 transform hover:scale-105 shadow-[0_0_15px_var(--color-accent)]"
-                  >
-                    Confirm as Seller
-                  </button>
-                  <button
-                    onClick={handleOpenDispute}
-                    className="w-full py-2 bg-destructive/10 text-destructive border border-destructive/30 font-semibold rounded-lg hover:bg-destructive/20 transition-all duration-300 flex items-center justify-center gap-2 text-sm"
-                  >
-                    <AlertTriangle size={16} />
-                    Raise Dispute
-                  </button>
-                </>
-              )}
+              {
+                resolved ? ( 
+                  <p className="text-muted-foreground"><i>#Escrow Resolved</i></p>
+                ) : (
+                  <>
+                  {isBuyer && !buyer_renter_confirmed && (
+                    <>
+                      <button
+                        onClick={() => handleBuyerConfirm(escrow)}
+                        className="w-full py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/80 transition-all duration-300 transform hover:scale-105 shadow-[0_0_15px_var(--color-primary)]"
+                      >
+                        Confirm as Buyer
+                      </button>
+                      <button
+                        onClick={handleOpenDispute}
+                        className="w-full py-2 bg-destructive/10 text-destructive border border-destructive/30 font-semibold rounded-lg hover:bg-destructive/20 transition-all duration-300 flex items-center justify-center gap-2 text-sm"
+                      >
+                        <AlertTriangle size={16} />
+                        Raise Dispute
+                      </button>
+                    </>
+                  )}
+                  
+                  {isSeller && !seller_landlord_confirmed && (
+                    <>
+                      <button
+                        onClick={() => handleSellerConfirm(escrow)}
+                        className="w-full py-3 bg-accent text-accent-foreground font-bold rounded-lg hover:bg-accent/80 transition-all duration-300 transform hover:scale-105 shadow-[0_0_15px_var(--color-accent)]"
+                      >
+                        Confirm as Seller
+                      </button>
+                      <button
+                        onClick={handleOpenDispute}
+                        className="w-full py-2 bg-destructive/10 text-destructive border border-destructive/30 font-semibold rounded-lg hover:bg-destructive/20 transition-all duration-300 flex items-center justify-center gap-2 text-sm"
+                      >
+                        <AlertTriangle size={16} />
+                        Raise Dispute
+                      </button>
+                    </>
+                  )}
+                  </>
+                )
+              }
+              
             </div>
           </div>
         </div>

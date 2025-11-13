@@ -277,7 +277,7 @@ export const usePropertyhook = () => {
             });
             if (effects?.status?.status === "success") {
               toast.success(
-                "dispute submitted successfully!, Expect a feedback soon",
+                "dispute resolvd successfully!",
                 { id: toastId }
               );
             } else {
@@ -326,7 +326,7 @@ export const usePropertyhook = () => {
             });
             if (effects?.status?.status === "success") {
               toast.success(
-                "dispute submitted successfully!, Expect a feedback soon",
+                "dispute resolved successfully!",
                 { id: toastId }
               );
             } else {

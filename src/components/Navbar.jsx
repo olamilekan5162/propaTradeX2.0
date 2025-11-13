@@ -76,7 +76,7 @@ const Navbar = ({ registeredUserData }) => {
             to={"profile"}
             className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
           >
-            <Jazzicon diameter={40} />
+            <Jazzicon diameter={40} seed={currentAccount?.address}/>
           </NavLink>
         </div>
       </div>

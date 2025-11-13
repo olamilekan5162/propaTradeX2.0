@@ -60,6 +60,8 @@ const Listing = () => {
     }
   );
 
+  console.log(userReceipts)
+
   // Check if user has a receipt for this property
   const propertyReceipt = userReceipts?.find(
     (receipt) => receipt.property_id === id
@@ -68,10 +70,6 @@ const Listing = () => {
   const handleBuyorRent = async (property) => {
     await buyOrRentProperty(property);
   };
-
-  // const handleRaiseDispute = async (property) => {
-  //   await buyOrRentProperty(property);
-  // };
 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -374,7 +372,7 @@ const Listing = () => {
                     <span className="font-semibold text-primary">IOTA</span>
                   </div>
 
-                  <div className="flex justify-between items-center pt-2 border-t border-border">
+                  {/* <div className="flex justify-between items-center pt-2 border-t border-border">
                     <span className="text-muted-foreground">Explorer</span>
                     <a
                       href="#"
@@ -382,7 +380,7 @@ const Listing = () => {
                     >
                       View on Tangle <ExternalLink size={14} />
                     </a>
-                  </div>
+                  </div> */}
                 </div>
               </div>
 
@@ -398,7 +396,7 @@ const Listing = () => {
               </div>
 
               {/* Documents (if sale) */}
-              {isForSale && property?.documents_cid && (
+              {isForSale && property?.documents_cid && property?.owner === currentAccount?.address && (
                 <div className="border-t border-border pt-4">
                   <a
                     href={property.documents_cid}

@@ -8,6 +8,7 @@ import Chat from "./routes/Chat";
 import UploadPage from "./routes/UploadPage";
 import LandingPage from "./routes/LandingPage";
 import Admin from "./routes/Admin";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 export const router = createBrowserRouter([
   {
@@ -16,12 +17,12 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <LandingPage /> },
       { path: "explore", element: <Home /> },
-      { path: "dashboard", element: <Dashboard /> },
-      { path: "listing/:id", element: <Listing /> },
-      { path: "profile", element: <Profile /> },
-      { path: "upload", element: <UploadPage /> },
-      { path: "chats", element: <Chat /> },
-      { path: "admin", element: <Admin /> },
+      { path: "dashboard", element: (<ProtectedRoute><Dashboard /></ProtectedRoute>) },
+      { path: "listing/:id", element: (<ProtectedRoute><Listing /></ProtectedRoute>) },
+      { path: "profile", element: (<ProtectedRoute><Profile /></ProtectedRoute>) },
+      { path: "upload", element: (<ProtectedRoute><UploadPage /></ProtectedRoute>)},
+      { path: "chats", element: (<ProtectedRoute><Chat /></ProtectedRoute>)},
+      { path: "admin", element: (<ProtectedRoute><Admin /></ProtectedRoute>)},
     ],
   },
 ]);
