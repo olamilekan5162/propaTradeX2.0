@@ -119,9 +119,9 @@ export default function Admin() {
                 <h2 className="text-2xl font-semibold mb-4 text-[var(--color-foreground)]">
                   Active Disputes
                 </h2>
-                {enrichedDisputes.lenght > 0 ? (
+                {enrichedDisputes && enrichedDisputes.length > 0 ? (
                   <DisputeList disputes={enrichedDisputes} />
-                ) :(
+                ) : (
                   <div className="text-center py-2">
                     <div className="bg-card border border-border rounded-xl p-12">
                       <AlertOctagon
@@ -129,16 +129,14 @@ export default function Admin() {
                         size={48}
                       />
                       <h3 className="text-xl font-bold mb-2">
-                          No Dispute Found
+                        No Dispute Found
                       </h3>
                       <p className="text-muted-foreground mb-6">
-                          Dispute details will appear here
+                        Dispute details will appear here
                       </p>
-                     
                     </div>
                   </div>
-                )
-                }
+                )}
               </div>
             )}
             {activeTab === "kyc" && (
