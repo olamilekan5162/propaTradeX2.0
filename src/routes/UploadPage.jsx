@@ -348,7 +348,8 @@ const UploadPage = () => {
             <div>
               <label className="block font-semibold mb-2 flex items-center gap-2">
                 <Video size={16} className="text-primary" />
-                Property Video <span className="text-xs text-muted-foreground font-normal">(Optional)</span>
+                Property Video *
+                {/* <span className="text-xs text-muted-foreground font-normal">(Optional)</span> */}
               </label>
               <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary/50 transition-all cursor-pointer bg-background/50">
                 <input
@@ -376,7 +377,8 @@ const UploadPage = () => {
               <div>
                 <label className="block font-semibold mb-2 flex items-center gap-2">
                   <FileText size={16} className="text-primary" />
-                  Property Documents <span className="text-xs text-muted-foreground font-normal">(Optional)</span>
+                  Property Documents *
+                  {/* <span className="text-xs text-muted-foreground font-normal">(Optional)</span> */}
                 </label>
                 <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary/50 transition-all cursor-pointer bg-background/50">
                   <input
