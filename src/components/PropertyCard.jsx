@@ -32,10 +32,21 @@ const PropertyCard = ({ property }) => {
       <div className="p-5 flex flex-col gap-3 flex-1">
         {/* Property Info */}
         <div>
-          <h3 className="text-lg font-bold text-foreground mb-1 line-clamp-1">
-            {property?.property_type}
-          </h3>
-          <div className="flex items-center gap-1.5 text-muted-foreground text-sm">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-bold text-foreground mb-1 line-clamp-1">
+              {property?.property_type}
+            </h3>
+            <span
+              className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                property?.listing_type === 1
+                  ? "bg-blue-500/20 text-blue-500"
+                  : "bg-purple-500/20 text-purple-500"
+              }`}
+            >
+              {property?.listing_type === 1 ? "For Sale" : "For Rent"}
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5 text-muted-foreground text-sm mt-1">
             <MapPin size={14} />
             <p className="line-clamp-1">{property?.property_address}</p>
           </div>
