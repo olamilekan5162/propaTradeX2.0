@@ -50,15 +50,14 @@ Each user has a dashboard accessible after connecting their IOTA wallet.
 
 ## Tech Stack
 
-| Layer                  | Technology                                     |
-| ---------------------- | ---------------------------------------------- |
-| **Blockchain**         | IOTA blockchain (smart contracts in Move)      |
-| **Frontend**           | React.js, TypeScript, TailwindCSS              |
-| **Wallet Integration** | IOTA Wallet, @iota/dapp-kit                    |
-| **Storage**            | IPFS via Pinata (documents, images, videos)    |
-| **State Management**   | @tanstack/react-query                          |
-| **Build Tool**         | Vite                                           |
-| **Data Storage**       | IOTA Shared Objects (ProfileRegistry, Escrows) |
+| Layer                  | Technology                                  |
+| ---------------------- | ------------------------------------------- |
+| **Blockchain**         | IOTA blockchain (smart contracts in Move)   |
+| **Frontend**           | React.js, TypeScript, TailwindCSS           |
+| **Wallet Integration** | IOTA Wallet, @iota/dapp-kit                 |
+| **Storage**            | IPFS via Pinata (documents, images, videos) |
+| **State Management**   | @tanstack/react-query                       |
+| **Build Tool**         | Vite                                        |
 
 ## Getting Started
 
@@ -74,19 +73,16 @@ Each user has a dashboard accessible after connecting their IOTA wallet.
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/freedteck/propatradex.git
+   git clone https://github.com/freedteck/propatrade.git
    cd propatradex
    ```
 
-2. **Deploy smart contract:**
+2. **Install frontend dependencies:**
 
    ```bash
-   cd contracts
-   iota move build
-   iota client publish --gas-budget 100000000
+   cd frontend
+   npm install
    ```
-
-   Save the Package ID and ProfileRegistry object ID.
 
 3. **Set up environment variables:**
 
@@ -97,14 +93,7 @@ Each user has a dashboard accessible after connecting their IOTA wallet.
    VITE_PINATA_GATEWAY=<YOUR_PINATA_GATEWAY_URL>
    ```
 
-4. **Install frontend dependencies:**
-
-   ```bash
-   cd frontend
-   npm install
-   ```
-
-5. **Run the development server:**
+4. **Run the development server:**
 
    ```bash
    npm run dev
@@ -141,13 +130,6 @@ propatradex/
 6. **Confirm as buyer** to release funds
 7. **Verify** ownership transfer and receipt NFTs
 
-### Smart Contract Tests
-
-```bash
-cd contracts
-iota move test
-```
-
 ## Contributing
 
 We're building transparent real estate with community at the core. If you're a:
@@ -158,7 +140,7 @@ We're building transparent real estate with community at the core. If you're a:
 
 Feel free to contribute or join the discussion.
 
-**GitHub Repository:** [GitHub](https://github.com/freedteck/propatradex)
+**GitHub Repository:** [GitHub](https://github.com/freedteck/propatrade)
 
 ## License
 
