@@ -9,12 +9,17 @@ const LandingPage = () => {
 
       {/* Hero Section */}
       <div className="relative text-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-background to-primary/10"></div>
+        <img
+          src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?q=80&w=1974&auto=format&fit=crop"
+          alt="Modern House"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/85"></div>
         <div className="relative z-10 container mx-auto flex flex-col items-center justify-center min-h-[80vh] py-20 px-4">
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tighter bg-gradient-to-r from-foreground to-muted-foreground text-transparent bg-clip-text mb-4">
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tighter text-white mb-4">
             The Future of Real Estate.
           </h1>
-          <p className="mt-2 text-lg md:text-xl max-w-3xl mx-auto text-muted-foreground">
+          <p className="mt-2 text-lg md:text-xl max-w-3xl mx-auto text-gray-200">
             A decentralized, zero-fee marketplace for buying and renting properties, powered by IOTA.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-4">
